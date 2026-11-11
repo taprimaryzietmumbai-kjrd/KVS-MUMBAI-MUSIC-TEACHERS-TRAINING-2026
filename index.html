@@ -96,11 +96,24 @@ function verifyProfile(){
   if(!data||!data.ok){$("verifyStatus").textContent=(data&&data.message)||"Verification failed.";return;}
   const p=data.profile||{};$("verifyStatus").textContent="Participant record verified.";
   const fields=[["Participant Name",p.name],["Designation",p.designation],["Kendriya Vidyalaya",p.school],["KVS Region",p.region],["Employee Code",p.employeeCode],["Date of Birth",formatDateDisplay(p.dob)],["Date of Joining KVS",formatDateDisplay(p.doj)],["Gender",p.gender],["Social Category",p.category],["WhatsApp",p.whatsapp],["Personal Email",p.email],["Official / Vidyalaya Email",p.officialEmail],["Educational Qualification",p.education],["Target Group",p.targetGroup],["School Code",p.schoolCode],["District",p.district],["State",p.state],["Revenue Division",p.division],["Training Title",p.trainingTitle],["Training Dates",(p.trainingFrom||"")+" – "+(p.trainingTo||"")],["Training Days",p.trainingDays]];
-  $("verifiedProfile").innerHTML='<div class="tile" style="margin-top:14px"><span class="tag">Record matched</span><h3>'+esc(p.name||"Participant profile")+'</h3><div class="tablewrap"><table>'+fields.filter(x=>x[1]).map(x=>'<tr><th>'+esc(x[0])+'</th><td>'+esc(x[1])+'</td></tr>').join("")+'</table></div><small class="muted">'+esc(p.locationStatus||"")+'</small></div>';
+  $("verifiedProfile").innerHTML='<div class="tile" style="margin-top:14px"><span class="tag">Record matched</span><h3>'+esc(p.name||"Participant profile")+'</h3><div class="tablewrap"><table>'+fields.filter(x=>x[1]).map(x=>'<tr><th>'+esc(x[0])+'</th><td>'+esc(x[1])+'</td></tr>').join("")+'</table></div><small class="muted">'+esc(p.locationStatus||"")+'</small><div class="actions"><button class="btn" type="button" onclick="saveParticipantPdf()">Save Participant PDF · A4 Portrait</button></div><div id="pdfSaveStatus" class="muted" aria-live="polite"></div></div>';
  };
  const s=document.createElement("script");s.id="sangeetJsonp";
  s.src=SANGEET_APPS_SCRIPT_URL+"?action=verify&employeeCode="+encodeURIComponent(code)+"&dob="+encodeURIComponent(dob)+"&doj="+encodeURIComponent(doj)+"&callback="+cb;
  s.onerror=function(){delete window[cb];$("verifyStatus").textContent="Could not reach the verification service. Please check deployment access and URL.";s.remove();};
+ document.body.appendChild(s);
+}
+function saveParticipantPdf(){
+ const code=$("verifyCode").value.trim(),dob=toDDMMYYYY($("verifyDOB").value),doj=toDDMMYYYY($("verifyDOJ").value);
+ $("pdfSaveStatus").textContent="Preparing your one-page A4 portrait PDF…";
+ const cb="sangeetPdfCallback"+Date.now();
+ window[cb]=function(data){delete window[cb];const old=document.getElementById("sangeetPdfJsonp");if(old)old.remove();
+  if(!data||!data.ok){$("pdfSaveStatus").textContent=(data&&data.message)||"PDF could not be saved.";return;}
+  $("pdfSaveStatus").innerHTML="PDF saved successfully: <a href=\""+esc(data.fileUrl)+"\" target=\"_blank\" rel=\"noopener\">Open / download "+esc(data.fileName||"Participant PDF")+"</a>";
+ };
+ const s=document.createElement("script");s.id="sangeetPdfJsonp";
+ s.src=SANGEET_APPS_SCRIPT_URL+"?action=saveProfilePdf&employeeCode="+encodeURIComponent(code)+"&dob="+encodeURIComponent(dob)+"&doj="+encodeURIComponent(doj)+"&callback="+cb;
+ s.onerror=function(){delete window[cb];$("pdfSaveStatus").textContent="Could not reach the PDF service. Check the Apps Script deployment.";s.remove();};
  document.body.appendChild(s);
 }
 function renderAll(){renderParticipants();renderResources();renderReflections();renderGlimpses()}renderAll();const savedUrl=localStorage.getItem('sangeet_service_url');if(savedUrl)$('appsScriptUrl').value=savedUrl;
