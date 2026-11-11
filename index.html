@@ -79,10 +79,13 @@ function exportReflections(){let a=get('reflections');download('music-training-r
 function renderGlimpses(){let a=get('glimpses');$('glimpseList').innerHTML=a.map((r,i)=>'<div class="tile resource"><h3>'+esc(r.title)+'</h3><a href="'+esc(r.url)+'" target="_blank" rel="noopener">Open link ↗</a><div class="actions"><button class="btn danger" onclick="removeItem(\'glimpses\','+i+')">Remove</button></div></div>').join('');$('glimpseEmpty').style.display=a.length?'none':'block'}
 $('glimpseForm').addEventListener('submit',e=>{e.preventDefault();let a=get('glimpses');a.push({title:$('gtitle').value,url:$('gurl').value});put('glimpses',a);e.target.reset();renderGlimpses()});
 const SANGEET_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
-function toDDMMYYYY(value){const m=String(value||"").match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(value||"");}\nfunction formatDateDisplay(value){const m=String(value||"").match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(value||"");}\nfunction verifyProfile(){
+function toDDMMYYYY(value){const m=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(value||"");}
+function formatDateDisplay(value){const m=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(value||"");}
+function verifyProfile(){
  const code=$("verifyCode").value.trim(),dob=toDDMMYYYY($("verifyDOB").value),doj=toDDMMYYYY($("verifyDOJ").value);
  $("verifiedProfile").innerHTML="";
- if(!code||!dob||!doj){$("verifyStatus").textContent="Please enter Employee Code, DOB and DOJ in DD/MM/YYYY format.";return;}\n 
+ if(!code||!dob||!doj){$("verifyStatus").textContent="Please enter Employee Code, DOB and DOJ in DD/MM/YYYY format.";return;}
+ 
  $("verifyStatus").textContent="Checking participant record…";
  const cb="sangeetCallback"+Date.now();
  window[cb]=function(data){
