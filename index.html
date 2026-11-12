@@ -188,7 +188,8 @@ function openParticipantCertificate(){
  if(!password){$('certStatus').textContent='Please complete all four fields. Year of Joining and WhatsApp ending must each contain four digits.';return;}
  $('certStatus').textContent='Checking the participant record and searching for the matching certificate image…';
  const url=SANGEET_APPS_SCRIPT_URL+'?action=certificate&password='+encodeURIComponent(password);
- const win=window.open(url,'_blank','noopener');
+ const win=window.open(url,'_blank');
+ if(win)win.opener=null;
  if(!win){$('certStatus').textContent='Your browser blocked the certificate tab. Please allow pop-ups for this website and try again.';return;}
  $('certStatus').textContent='Certificate request opened in a new tab. If no matching certificate is found, check the spelling of the surname and the other details.';
 }
