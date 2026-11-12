@@ -21,7 +21,7 @@
 </header>
 <main class="wrap">
 <div class="stats">
-<div class="stat"><strong>5 Days</strong><span>Training duration</span></div><div class="stat"><strong>23–27 Nov</strong><span>November 2026</span></div><div class="stat"><strong>In-Person</strong><span>Mode of training</span></div><div class="stat"><strong id="participantCount">0</strong><span>Participants added on this device</span></div>
+<div class="stat"><strong>5 Days</strong><span>Training duration</span></div><div class="stat"><strong>23–27 Nov</strong><span>November 2026</span></div><div class="stat"><strong>In-Person</strong><span>Mode of training</span></div><div class="stat"><strong id="participantCount">0</strong><span>Participants in official sheet</span></div>
 </div>
 <div class="layout">
 <nav class="side" aria-label="Main navigation">
@@ -170,6 +170,26 @@ function submitSelfieGpsEvidence(){
   const form=document.createElement('form');form.method='POST';form.action=SANGEET_APPS_SCRIPT_URL;form.target='sangeetEvidenceFrame';form.style.display='none';
   const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
 }
-function renderAll(){renderParticipants();renderResources();renderReflections();renderGlimpses()}renderAll();const savedUrl=localStorage.getItem('sangeet_service_url');if(savedUrl)$('appsScriptUrl').value=savedUrl;
+function refreshParticipantCount(){
+ const el=$('participantCount');
+ el.textContent='…';
+ const cb='sangeetCountCallback'+Date.now();
+ let finished=false;
+ const cleanup=()=>{const node=$('sangeetCountJsonp');if(node)node.remove();try{delete window[cb]}catch(e){}};
+ const timer=setTimeout(()=>{if(finished)return;finished=true;cleanup();el.textContent='—';el.title='Could not load the count from the official participant sheet.';},15000);
+ window[cb]=function(data){
+  if(finished)return;finished=true;clearTimeout(timer);cleanup();
+  if(data&&data.ok&&Number.isFinite(Number(data.count))){el.textContent=String(Number(data.count));el.title='Live count from LOP PRTM MUMBAI / PRTM MUMBAI';}
+  else{el.textContent='—';el.title=(data&&data.message)||'Count unavailable from the participant sheet.';}
+ };
+ const s=document.createElement('script');s.id='sangeetCountJsonp';
+ s.src=SANGEET_APPS_SCRIPT_URL+'?action=participantCount&callback='+encodeURIComponent(cb);
+ s.onerror=function(){if(finished)return;finished=true;clearTimeout(timer);cleanup();el.textContent='—';el.title='Could not reach the participant count service.';};
+ document.body.appendChild(s);
+}
+function renderAll(){renderParticipants();renderResources();renderReflections();renderGlimpses()}
+renderAll();
+refreshParticipantCount();
+const savedUrl=localStorage.getItem('sangeet_service_url');if(savedUrl)$('appsScriptUrl').value=savedUrl;
 </script>
 </body></html>
