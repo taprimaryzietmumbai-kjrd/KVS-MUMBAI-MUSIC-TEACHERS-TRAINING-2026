@@ -48,7 +48,35 @@
 <div class="tile"><h3>04 · Music pedagogy</h3><p>Experiential learning, inclusive participation, listening skills and classroom strategies.</p></div>
 <div class="tile"><h3>05 · Creativity and composition</h3><p>Improvisation, song adaptation, movement, creative expression and student compositions.</p></div>
 <div class="tile"><h3>06 · Assessment and performance</h3><p>Observation, performance rubrics, reflective practice and documenting musical growth.</p></div></div></div></section>
-<section id="verify" class="section"><div class="panel"><div class="eyebrow">Participant self-service</div><h2>Verify your participant profile</h2><p class="muted">Verify your record using the three details recorded in the official participant sheet.</p><div class="notice">Enter Employee Code, Date of Birth and Date of Joining KVS. Use the calendar controls for both dates.</div><label for="verifyCode">Employee Code</label><input id="verifyCode" autocomplete="off" placeholder="Enter Employee Code" required><div class="formgrid"><div><label for="verifyDOB">Date of Birth (DOB)</label><div class="date-entry"><input id="verifyDOB" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" autocomplete="off" required><button class="date-open" type="button" aria-label="Choose date of birth" onclick="openDatePicker('verifyDOB','dobPicker')">📅</button><input id="dobPicker" class="native-date-picker" type="date" aria-hidden="true" tabindex="-1" onchange="setDateFromPicker('dobPicker','verifyDOB')"></div></div><div><label for="verifyDOJ">Date of Joining KVS (DOJ)</label><div class="date-entry"><input id="verifyDOJ" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" autocomplete="off" required><button class="date-open" type="button" aria-label="Choose date of joining" onclick="openDatePicker('verifyDOJ','dojPicker')">📅</button><input id="dojPicker" class="native-date-picker" type="date" aria-hidden="true" tabindex="-1" onchange="setDateFromPicker('dojPicker','verifyDOJ')"></div></div></div><div class="actions"><button class="btn" type="button" onclick="verifyProfile()">Verify and fetch profile</button></div><div id="verifyStatus" aria-live="polite" class="muted" style="margin-top:14px"></div><div id="verifiedProfile"></div><div class="notice" style="margin-top:18px"><strong>Verification mismatch?</strong><br>If your Employee Code, DOB or Date of Joining does not match the official record, or your profile details are incorrect, submit a correction request using the link below. ZIET Mumbai will review the submitted details.</div><div class="actions"><a class="btn" href="https://docs.google.com/spreadsheets/d/1W1N0mDY6t2d_GGJrqgkHgGeJrK9-kg0A2HMQAojkhr0/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Submit Participant Corrections</a></div></div></section>
+<section id="verify" class="section"><div class="panel"><div class="eyebrow">Participant self-service</div><h2>Verify your participant profile</h2><p class="muted">Verify your record using the three details recorded in the official participant sheet.</p><div class="notice">Enter Employee Code, Date of Birth and Date of Joining KVS. Use the calendar controls for both dates.</div><label for="verifyCode">Employee Code</label><input id="verifyCode" autocomplete="off" placeholder="Enter Employee Code" required><div class="formgrid"><div><label for="verifyDOB">Date of Birth (DOB)</label><div class="date-entry"><input id="verifyDOB" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" autocomplete="off" required><button class="date-open" type="button" aria-label="Choose date of birth" onclick="openDatePicker('verifyDOB','dobPicker')">📅</button><input id="dobPicker" class="native-date-picker" type="date" aria-hidden="true" tabindex="-1" onchange="setDateFromPicker('dobPicker','verifyDOB')"></div></div><div><label for="verifyDOJ">Date of Joining KVS (DOJ)</label><div class="date-entry"><input id="verifyDOJ" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" autocomplete="off" required><button class="date-open" type="button" aria-label="Choose date of joining" onclick="openDatePicker('verifyDOJ','dojPicker')">📅</button><input id="dojPicker" class="native-date-picker" type="date" aria-hidden="true" tabindex="-1" onchange="setDateFromPicker('dojPicker','verifyDOJ')"></div></div></div><div class="actions"><button class="btn" type="button" onclick="verifyProfile()">Verify and fetch profile</button></div><div id="verifyStatus" aria-live="polite" class="muted" style="margin-top:14px"></div><div id="verifiedProfile"></div><div class="notice" style="margin-top:18px"><strong>Need to correct your participant details?</strong><br>Submit your correction request here. Enter your current official identity details exactly as recorded in the participant sheet. OTP is not used. Eligible changes are updated automatically only when one unique official record matches. DOB, DOJ and Employee Code changes are recorded for validation and are not changed automatically.</div>
+<div class="tile" style="margin-top:14px">
+<h3>Participant Correction Request</h3>
+<form id="correctionForm">
+<div class="formgrid">
+<div><label for="corrEmployeeCode">Current Employee Code *</label><input id="corrEmployeeCode" required inputmode="numeric" autocomplete="off" placeholder="Full Employee Code"></div>
+<div><label for="corrName">Participant Name</label><input id="corrName" placeholder="Name as recorded in the official sheet"></div>
+<div><label for="corrCurrentDOB">Current official DOB *</label><input id="corrCurrentDOB" type="date" required></div>
+<div><label for="corrCurrentDOJ">Current official DOJ *</label><input id="corrCurrentDOJ" type="date" required></div>
+</div>
+<p class="muted">Enter only the fields that need correction. Leave other fields blank.</p>
+<div class="formgrid">
+<div><label for="corrNewName">Correct Participant Name</label><input id="corrNewName"></div>
+<div><label for="corrDesignation">Correct Designation</label><input id="corrDesignation"></div>
+<div><label for="corrSchool">Correct School</label><input id="corrSchool"></div>
+<div><label for="corrRegion">Correct Region</label><input id="corrRegion"></div>
+<div><label for="corrWhatsapp">Correct WhatsApp Number</label><input id="corrWhatsapp" inputmode="numeric"></div>
+<div><label for="corrEmail">Correct Personal Email</label><input id="corrEmail" type="email"></div>
+<div><label for="corrOfficialEmail">Correct Vidyalaya Email</label><input id="corrOfficialEmail" type="email"></div>
+<div><label for="corrEducation">Correct Educational Qualification</label><input id="corrEducation"></div>
+<div><label for="corrTargetGroup">Correct Target Group</label><input id="corrTargetGroup"></div>
+<div><label for="corrNewDOB">Proposed corrected DOB (if needed)</label><input id="corrNewDOB" type="date"></div>
+<div><label for="corrNewDOJ">Proposed corrected DOJ (if needed)</label><input id="corrNewDOJ" type="date"></div>
+<div><label for="corrNewEmployeeCode">Proposed corrected Employee Code (if needed)</label><input id="corrNewEmployeeCode" inputmode="numeric"></div>
+</div>
+<label for="corrReason">Reason / additional details</label><textarea id="corrReason" rows="3" placeholder="Briefly explain the correction"></textarea>
+<div class="actions"><button class="btn" id="submitCorrectionBtn" type="submit">Submit Correction Request</button><a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1W1N0mDY6t2d_GGJrqgkHgGeJrK9-kg0A2HMQAojkhr0/edit" target="_blank" rel="noopener noreferrer">Open Correction Register</a></div>
+<div id="correctionStatus" class="muted" aria-live="polite" style="margin-top:12px"></div>
+</form></div></div></section>
 <section id="certificates" class="section"><div class="panel"><div class="eyebrow">Participant self-service</div><h2>Certificate Download</h2><p class="muted">Enter the details below. Your certificate password is generated automatically in lowercase, without spaces.</p><div class="notice">Password format: surname + 4-digit year of joining + last 4 digits of WhatsApp number + email before @ + full Employee Code (all digits). Enter your complete Employee Code exactly as recorded in the official participant sheet.</div><div class="formgrid"><div><label for="certSurname">Surname</label><input id="certSurname" autocomplete="family-name" placeholder="e.g. Srivastava" oninput="generateCertificatePassword()"></div><div><label for="certYOJ">4-digit Year of Joining</label><input id="certYOJ" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" oninput="generateCertificatePassword()"></div><div><label for="certWhatsApp">Last 4 digits of WhatsApp number</label><input id="certWhatsApp" inputmode="numeric" maxlength="4" placeholder="e.g. 5678" oninput="generateCertificatePassword()"></div><div><label for="certEmail">Email (before @)</label><input id="certEmail" autocomplete="username" placeholder="e.g. anand" oninput="generateCertificatePassword()"></div><div><label for="certEmployeeCode">Full Employee Code (all digits)</label><input id="certEmployeeCode" inputmode="numeric" autocomplete="off" placeholder="Enter complete Employee Code" oninput="generateCertificatePassword()"></div></div><label for="certPassword">Your automatically generated password</label><input id="certPassword" readonly placeholder="Your password will appear here" style="font-weight:700;letter-spacing:.3px"><div class="muted" id="certPasswordExample">Example: srivastava20105678anand123456</div><div class="actions"><button class="btn" type="button" onclick="openParticipantCertificate()">Find and open my certificate</button></div><div id="certStatus" class="muted" aria-live="polite" style="margin-top:12px">Your certificate will open if the password matches the participant sheet and the matching image exists in the certificate Drive folder.</div></div></section>
 <section id="resources" class="section"><div class="panel"><div class="eyebrow">Digital repository</div><h2>Learning resources</h2><p class="muted">Add links to presentations, PDFs, audio, video and other workshop materials. Use shareable links accessible to participants.</p><form id="resourceForm"><div class="formgrid"><div><label for="rtitle">Resource title *</label><input id="rtitle" required placeholder="e.g. Day 1 presentation"></div><div><label for="rtype">Resource type</label><select id="rtype"><option>PPT / Presentation</option><option>PDF / Reading</option><option>Audio</option><option>Video</option><option>Feedback / Form</option><option>Other</option></select></div></div><label for="rurl">Shareable URL *</label><input id="rurl" type="url" required placeholder="https://..."><div class="actions"><button class="btn" type="submit">Add resource link</button></div></form></div><div class="panel"><div id="resourceList" class="grid"></div><div id="resourceEmpty" class="empty">Resource links will appear here when added.</div></div></section>
 <section id="feedback" class="section"><div class="panel"><div class="eyebrow">Reflection</div><h2>Feedback & learning reflection</h2><p class="muted">A local reflection pad for drafting responses. It does not submit to organisers or a spreadsheet.</p><form id="feedbackForm"><label for="fname">Name (optional)</label><input id="fname" placeholder="Your name"><label for="fday">Training day</label><select id="fday"><option>Day 1 · 23 November</option><option>Day 2 · 24 November</option><option>Day 3 · 25 November</option><option>Day 4 · 26 November</option><option>Day 5 · 27 November</option></select><label for="flearn">One important learning from today</label><textarea id="flearn" required></textarea><label for="fapply">How will you apply it in your KV?</label><textarea id="fapply"></textarea><div class="actions"><button class="btn" type="submit">Save reflection on this device</button><button class="btn ghost" type="button" onclick="exportReflections()">Export reflections CSV</button></div></form></div><div class="panel"><h3>Saved reflections</h3><div id="reflectionList" class="muted">No reflections saved on this device.</div></div></section>
@@ -166,6 +194,55 @@ function submitSelfieGpsEvidence(){
   const form=document.createElement('form');form.method='POST';form.action=SANGEET_APPS_SCRIPT_URL;form.target='sangeetEvidenceFrame';form.style.display='none';
   const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
 }
+
+// Participant correction form: POST to the existing Apps Script web app.
+$('correctionForm').addEventListener('submit',function(e){
+ e.preventDefault();
+ const changes={
+  name:$('corrNewName').value.trim(),
+  designation:$('corrDesignation').value.trim(),
+  school:$('corrSchool').value.trim(),
+  region:$('corrRegion').value.trim(),
+  whatsapp:$('corrWhatsapp').value.trim(),
+  email:$('corrEmail').value.trim(),
+  officialEmail:$('corrOfficialEmail').value.trim(),
+  education:$('corrEducation').value.trim(),
+  targetGroup:$('corrTargetGroup').value.trim(),
+  dob:$('corrNewDOB').value,
+  doj:$('corrNewDOJ').value,
+  employeeCode:$('corrNewEmployeeCode').value.trim()
+ };
+ const payload={
+  action:'submitParticipantCorrection',
+  employeeCode:$('corrEmployeeCode').value.trim(),
+  submittedName:$('corrName').value.trim(),
+  currentDob:$('corrCurrentDOB').value,
+  currentDoj:$('corrCurrentDOJ').value,
+  changes:changes,
+  reason:$('corrReason').value.trim()
+ };
+ if(!payload.employeeCode||!payload.currentDob||!payload.currentDoj){
+  $('correctionStatus').textContent='Please enter Employee Code, current official DOB and current official DOJ.';
+  return;
+ }
+ $('submitCorrectionBtn').disabled=true;
+ $('correctionStatus').textContent='Submitting your correction request securely…';
+ let frame=$('sangeetCorrectionFrame');
+ if(!frame){frame=document.createElement('iframe');frame.name='sangeetCorrectionFrame';frame.id='sangeetCorrectionFrame';frame.style.display='none';document.body.appendChild(frame);}
+ const form=document.createElement('form');form.method='POST';form.action=SANGEET_APPS_SCRIPT_URL;form.target='sangeetCorrectionFrame';form.style.display='none';
+ const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
+});
+window.addEventListener('message',function(e){
+ if(!e.data||e.data.type!=='SANGEET_CORRECTION_RESULT')return;
+ $('submitCorrectionBtn').disabled=false;
+ const d=e.data.data||{};
+ if(d.ok){
+  $('correctionStatus').textContent='Request ID: '+(d.requestId||'')+' | Status: '+(d.status||'RECORDED')+'. '+(d.message||'Your request has been recorded.');
+ }else{
+  $('correctionStatus').textContent='Unable to submit request: '+(d.message||'Please try again.');
+ }
+});
+
 function generateCertificatePassword(){
  const surname=String($('certSurname').value||'').trim().split(/\s+/).filter(Boolean).pop()||'';
  const year=String($('certYOJ').value||'').replace(/\D/g,'');
