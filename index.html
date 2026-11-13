@@ -56,8 +56,8 @@
 <div class="formgrid">
 <div><label for="corrEmployeeCode">Current Employee Code *</label><input id="corrEmployeeCode" required inputmode="numeric" autocomplete="off" placeholder="Full Employee Code"></div>
 <div><label for="corrName">Participant Name</label><input id="corrName" placeholder="Name as recorded in the official sheet"></div>
-<div><label for="corrCurrentDOB">Current official DOB *</label><input id="corrCurrentDOB" type="text" inputmode="numeric" placeholder="DD/MM/YYYY (or . - ,)" maxlength="10" required></div>
-<div><label for="corrCurrentDOJ">Current official DOJ *</label><input id="corrCurrentDOJ" type="text" inputmode="numeric" placeholder="DD/MM/YYYY (or . - ,)" maxlength="10" required></div>
+<div><label for="corrCurrentDOB">Current official DOB *</label><input id="corrCurrentDOB" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" required></div>
+<div><label for="corrCurrentDOJ">Current official DOJ *</label><input id="corrCurrentDOJ" type="text" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" required></div>
 </div>
 <p class="muted">Enter only the fields that need correction. Leave other fields blank.</p>
 <div class="formgrid">
@@ -107,28 +107,22 @@ function renderGlimpses(){let a=get('glimpses');$('glimpseList').innerHTML=a.map
 $('glimpseForm').addEventListener('submit',e=>{e.preventDefault();let a=get('glimpses');a.push({title:$('gtitle').value,url:$('gurl').value});put('glimpses',a);e.target.reset();renderGlimpses()});
 const SANGEET_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
 const SANGEET_CORRECTION_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYCLQQvkgEMuzhj8dwu7IHIjsZ1DTAGtfv6nSLxaXelvjfddJS6_dhVwTFn0AbwyOPQ/exec";
-function dateToISO(value){
+function normaliseDDMMYYYY(value){
  const s=String(value||"").trim();
- if(!s)return "";
- let d,mo,y;
- const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
- if(iso){y=Number(iso[1]);mo=Number(iso[2]);d=Number(iso[3]);}
- else{
-  const m=s.match(/^(\d{1,2})[\/.,-](\d{1,2})[\/.,-](\d{4})$/);
-  if(!m)return "";
-  d=Number(m[1]);mo=Number(m[2]);y=Number(m[3]);
- }
+ const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+ if(!m)return "";
+ const d=Number(m[1]),mo=Number(m[2]),y=Number(m[3]);
  const dt=new Date(y,mo-1,d);
  if(y<1900||y>2100||dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return "";
- return String(y).padStart(4,"0")+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+ return String(d).padStart(2,"0")+"/"+String(mo).padStart(2,"0")+"/"+String(y);
 }
-function isDDMMYYYY(value){return !!dateToISO(value);}
+function isDDMMYYYY(value){return !!normaliseDDMMYYYY(value);}
 function formatDateDisplay(value){return String(value||"").trim();}
-function dateValue(id){const raw=$(id).value.trim();return dateToISO(raw)||raw;}
+function dateValue(id){const raw=$(id).value.trim();return normaliseDDMMYYYY(raw)||raw;}
 function verifyProfile(){
  const code=$("verifyCode").value.trim(),dob=dateValue("verifyDOB"),doj=dateValue("verifyDOJ");
  $("verifiedProfile").innerHTML="";
- if(!code||!isDDMMYYYY(dob)||!isDDMMYYYY(doj)){$("verifyStatus").textContent="Enter valid DOB and DOJ as DD/MM/YYYY using /, . , - or , (for example, 05/11/1980 or 05.11.1980).";return;}
+ if(!code||!isDDMMYYYY(dob)||!isDDMMYYYY(doj)){$("verifyStatus").textContent="Enter valid DOB and DOJ as DD/MM/YYYY (for example, 05/11/1980).";return;}
  
  $("verifyStatus").textContent="Checking participant record…";
  const cb="sangeetCallback"+Date.now();
@@ -238,7 +232,7 @@ $('correctionForm').addEventListener('submit',function(e){
   reason:$('corrReason').value.trim()
  };
  if(!payload.employeeCode||!isDDMMYYYY(payload.currentDob)||!isDDMMYYYY(payload.currentDoj)){
-  $('correctionStatus').textContent='Enter Employee Code and valid current official DOB and DOJ. Use DD/MM/YYYY with /, . , - or , as separators.';
+  $('correctionStatus').textContent='Enter Employee Code and valid current official DOB and DOJ. Use DD/MM/YYYY using slashes, for example 05/11/1980.';
   return;
  }
  $('submitCorrectionBtn').disabled=true;
