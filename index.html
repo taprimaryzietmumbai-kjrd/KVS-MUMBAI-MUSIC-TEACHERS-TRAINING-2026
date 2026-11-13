@@ -250,7 +250,7 @@ function generateCertificatePassword(){
  const phone=String($('certWhatsApp').value||'').replace(/\D/g,'').slice(-4);
  const email=String($('certEmail').value||'').trim().split('@')[0];
  const cleanSurname=surname.toLowerCase().replace(/[^a-z]/g,'');
- const cleanEmail=email.toLowerCase().replace(/\s+/g,'');
+  const cleanEmail=email.toLowerCase().replace(/[^a-z0-9]/g,'');
   const ready=/^\d{4}$/.test(year)&&/^\d{4}$/.test(phone)&&cleanSurname&&cleanEmail;
   $('certPassword').value=ready?cleanSurname+year+phone+cleanEmail:'';
 }
