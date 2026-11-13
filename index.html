@@ -105,6 +105,7 @@ function exportReflections(){let a=get('reflections');download('music-training-r
 function renderGlimpses(){let a=get('glimpses');$('glimpseList').innerHTML=a.map((r,i)=>'<div class="tile resource"><h3>'+esc(r.title)+'</h3><a href="'+esc(r.url)+'" target="_blank" rel="noopener">Open link ↗</a><div class="actions"><button class="btn danger" onclick="removeItem(\'glimpses\','+i+')">Remove</button></div></div>').join('');$('glimpseEmpty').style.display=a.length?'none':'block'}
 $('glimpseForm').addEventListener('submit',e=>{e.preventDefault();let a=get('glimpses');a.push({title:$('gtitle').value,url:$('gurl').value});put('glimpses',a);e.target.reset();renderGlimpses()});
 const SANGEET_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
+const SANGEET_CORRECTION_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYCLQQvkgEMuzhj8dwu7IHIjsZ1DTAGtfv6nSLxaXelvjfddJS6_dhVwTFn0AbwyOPQ/exec";
 function openDatePicker(textId,pickerId){const text=$(textId),picker=$(pickerId);const m=text.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(m)picker.value=m[3]+"-"+m[2]+"-"+m[1];if(typeof picker.showPicker==="function"){picker.showPicker();}else{picker.focus();picker.click();}}
 function setDateFromPicker(pickerId,textId){const v=$(pickerId).value;if(v){const m=v.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)$(textId).value=m[3]+"/"+m[2]+"/"+m[1];}}
 function toDDMMYYYY(value){const m=String(value||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(value||"");}
@@ -195,7 +196,7 @@ function submitSelfieGpsEvidence(){
   const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
 }
 
-// Participant correction form: POST to the existing Apps Script web app.
+// Participant correction form: POST to the dedicated Correction Service deployment.
 $('correctionForm').addEventListener('submit',function(e){
  e.preventDefault();
  const changes={
@@ -229,7 +230,7 @@ $('correctionForm').addEventListener('submit',function(e){
  $('correctionStatus').textContent='Submitting your correction request securely…';
  let frame=$('sangeetCorrectionFrame');
  if(!frame){frame=document.createElement('iframe');frame.name='sangeetCorrectionFrame';frame.id='sangeetCorrectionFrame';frame.style.display='none';document.body.appendChild(frame);}
- const form=document.createElement('form');form.method='POST';form.action=SANGEET_APPS_SCRIPT_URL;form.target='sangeetCorrectionFrame';form.style.display='none';
+ const form=document.createElement('form');form.method='POST';form.action=SANGEET_CORRECTION_APPS_SCRIPT_URL;form.target='sangeetCorrectionFrame';form.style.display='none';
  const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
 });
 window.addEventListener('message',function(e){
