@@ -109,7 +109,7 @@ const SANGEET_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrpDbj
 const SANGEET_CORRECTION_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYCLQQvkgEMuzhj8dwu7IHIjsZ1DTAGtfv6nSLxaXelvjfddJS6_dhVwTFn0AbwyOPQ/exec";
 function normaliseDDMMYYYY(value){
  const s=String(value||"").trim();
- const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+ const m=s.match(/^(\d{1,2})\s*[.\/,\-]\s*(\d{1,2})\s*[.\/,\-]\s*(\d{4})$/);
  if(!m)return "";
  const d=Number(m[1]),mo=Number(m[2]),y=Number(m[3]);
  const dt=new Date(y,mo-1,d);
