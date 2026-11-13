@@ -110,9 +110,14 @@ const SANGEET_CORRECTION_APPS_SCRIPT_URL = "https://script.google.com/macros/s/A
 function dateToISO(value){
  const s=String(value||"").trim();
  if(!s)return "";
- const m=s.match(/^(\d{1,2})[\/.,-](\d{1,2})[\/.,-](\d{4})$/);
- if(!m)return "";
- const d=Number(m[1]),mo=Number(m[2]),y=Number(m[3]);
+ let d,mo,y;
+ const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(iso){y=Number(iso[1]);mo=Number(iso[2]);d=Number(iso[3]);}
+ else{
+  const m=s.match(/^(\d{1,2})[\/.,-](\d{1,2})[\/.,-](\d{4})$/);
+  if(!m)return "";
+  d=Number(m[1]);mo=Number(m[2]);y=Number(m[3]);
+ }
  const dt=new Date(y,mo-1,d);
  if(y<1900||y>2100||dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return "";
  return String(y).padStart(4,"0")+"-"+String(mo).padStart(2,"0")+"-"+String(d).padStart(2,"0");
