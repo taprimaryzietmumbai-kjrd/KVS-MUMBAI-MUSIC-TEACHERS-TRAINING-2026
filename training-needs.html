@@ -18,9 +18,27 @@ main{max-width:960px;margin:auto;padding:22px}.panel{background:white;border:1px
 <main>
 <div class="panel"><h2>Purpose of this assessment</h2><p class="muted">This assessment will help identify participants’ current practices, areas of confidence, professional learning priorities and support required for meaningful classroom application. Please respond candidly. Your responses are intended to inform the design and emphasis of the training.</p><div class="notice"><b>Important:</b> Complete the form and select “Download my response” to save your response as a CSV file on your device. This standalone page does not transmit responses to ZIET or a central spreadsheet.</div></div>
 <form id="tnaForm">
-<div class="panel"><h2>1. Participant profile</h2><div class="grid">
-<div class="field"><label for="name">Full name *</label><input id="name" required></div><div class="field"><label for="employee">Employee Code</label><input id="employee"></div>
-<div class="field"><label for="school">Kendriya Vidyalaya *</label><input id="school" required></div><div class="field"><label for="region">KVS Region *</label><select id="region" required><option value="">Select region</option><option>Mumbai</option><option>Ahmedabad</option><option>Jaipur</option><option>Patna</option><option>Raipur</option><option>Other</option></select></div>
+<div class="panel"><h2>1. Participant profile – Official P-file particulars</h2><p class="muted">Please enter your particulars as recorded in your official service / participant record. These details will help ZIET maintain accurate workshop documentation.</p><div class="grid">
+<div class="field"><label for="name">Full name (as per service record) *</label><input id="name" required></div>
+<div class="field"><label for="employee">Employee Code *</label><input id="employee" required></div>
+<div class="field"><label for="designation">Designation *</label><input id="designation" required placeholder="e.g. PGT (Music) / TGT / PRT"></div>
+<div class="field"><label for="school">Kendriya Vidyalaya *</label><input id="school" required></div>
+<div class="field"><label for="region">KVS Region *</label><select id="region" required><option value="">Select region</option><option>Mumbai</option><option>Ahmedabad</option><option>Jaipur</option><option>Patna</option><option>Raipur</option><option>Other</option></select></div>
+<div class="field"><label for="dob">Date of Birth (DOB) *</label><input id="dob" type="date" required></div>
+<div class="field"><label for="doj">Date of Joining KVS (DOJ) *</label><input id="doj" type="date" required></div>
+<div class="field"><label for="gender">Gender *</label><select id="gender" required><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select></div>
+<div class="field"><label for="category">Social Category *</label><select id="category" required><option value="">Select</option><option>General</option><option>SC</option><option>ST</option><option>OBC (NCL)</option><option>EWS</option><option>Other / Not specified</option></select></div>
+<div class="field"><label for="differentlyAbled">Differently abled? *</label><select id="differentlyAbled" required><option value="">Select</option><option value="No">No</option><option value="Yes">Yes</option></select></div>
+<div class="field"><label for="disabilityType">If yes, please specify type</label><input id="disabilityType" placeholder="Specify only if applicable"></div>
+<div class="field"><label for="whatsapp">WhatsApp Number *</label><input id="whatsapp" type="tel" inputmode="tel" required placeholder="10-digit mobile number"></div>
+<div class="field"><label for="personalEmail">Personal Email ID</label><input id="personalEmail" type="email"></div>
+<div class="field"><label for="officialEmail">Vidyalaya Official Email ID</label><input id="officialEmail" type="email"></div>
+<div class="field"><label for="qualification">Educational Qualification</label><input id="qualification"></div>
+<div class="field"><label for="targetGroup">Target Group / Teaching Group</label><input id="targetGroup" placeholder="As mentioned in the official participant record"></div>
+<div class="field"><label for="schoolCode">School Code</label><input id="schoolCode"></div>
+<div class="field"><label for="district">District</label><input id="district"></div>
+<div class="field"><label for="state">State</label><input id="state"></div>
+<div class="field"><label for="division">Revenue Division</label><input id="division"></div>
 <div class="field"><label for="experience">Years of experience teaching music</label><select id="experience"><option value="">Select</option><option>0–2 years</option><option>3–5 years</option><option>6–10 years</option><option>11–15 years</option><option>16–20 years</option><option>More than 20 years</option></select></div>
 <div class="field"><label for="grades">Classes currently taught</label><input id="grades" placeholder="e.g. III–VIII"></div>
 </div></div>
@@ -43,7 +61,7 @@ document.getElementById('tnaForm').addEventListener('submit',function(e){
 e.preventDefault();
 const priorities=[...document.querySelectorAll('input[name="priority"]:checked')].map(x=>x.value);
 if(priorities.length>5){document.getElementById('status').textContent='Please select no more than five priority areas.';return;}
-const rows=[['Section','Response'],['Participant name',v('name')],['Employee Code',v('employee')],['KV',v('school')],['KVS Region',v('region')],['Experience',v('experience')],['Classes taught',v('grades')],['Current practices',checks('practice').join('; ')],['Lesson frequency',v('frequency')],['School resources',v('resources')]];
+const rows=[['Section','Response'],['Participant name',v('name')],['Employee Code',v('employee')],['Designation',v('designation')],['Kendriya Vidyalaya',v('school')],['KVS Region',v('region')],['Date of Birth',v('dob')],['Date of Joining KVS',v('doj')],['Gender',v('gender')],['Social Category',v('category')],['Differently abled',v('differentlyAbled')],['Type of disability (if applicable)',v('disabilityType')],['WhatsApp Number',v('whatsapp')],['Personal Email ID',v('personalEmail')],['Vidyalaya Official Email ID',v('officialEmail')],['Educational Qualification',v('qualification')],['Target Group',v('targetGroup')],['School Code',v('schoolCode')],['District',v('district')],['State',v('state')],['Revenue Division',v('division')],['Experience',v('experience')],['Classes taught',v('grades')],['Current practices',checks('practice').join('; ')],['Lesson frequency',v('frequency')],['School resources',v('resources')]];
 ratingAreas.forEach((x,i)=>rows.push(['Confidence: '+x,v('rating'+i)]));
 rows.push(['Priority areas',priorities.join('; ')],['Instruments',v('instrument')],['Proficiency',v('level')],['Challenges',v('challenge')],['Expected learning',v('expect')],['Post-training application',v('application')],['Suggestions',v('other')],['Meaningful outcome',v('one')]);
 const csv=rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
