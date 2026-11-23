@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172554"><title>Daily Reflection | Sangeet Sadhana</title>
+<style>
+:root{--navy:#172554;--blue:#1d4ed8;--gold:#d6a84f;--ink:#172033;--muted:#64748b;--paper:#f5f7fb;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,#101b43,#183b69 60%,#815a32);color:#fff;padding:28px max(20px,calc((100% - 900px)/2))}
+.brand{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#f7dca5;font-weight:700}h1{font: bold clamp(28px,5vw,42px)/1.15 Georgia,serif;margin:10px 0}.hindi{color:#f6dca8;font-size:20px}
+main{max-width:900px;margin:28px auto;padding:0 18px}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:22px;margin-bottom:18px;box-shadow:0 3px 12px #0f172a08}
+h2{color:var(--navy);margin:0 0 8px}p,.muted{color:var(--muted)}label{display:block;font-weight:650;font-size:14px;margin:14px 0 5px}input,select,textarea{width:100%;font:inherit;border:1px solid #cbd5e1;border-radius:8px;padding:11px;background:white;color:var(--ink)}textarea{min-height:115px;resize:vertical}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{display:inline-block;border:0;border-radius:9px;background:var(--blue);color:#fff;text-decoration:none;padding:11px 16px;font:600 15px system-ui;cursor:pointer}.btn.secondary{background:#eaf0ff;color:#173b86}.entry{border-left:4px solid var(--gold);padding:12px 15px;background:#fbf8f1;border-radius:0 10px 10px 0;margin:12px 0}.entry p{margin:7px 0}.foot{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+</style></head><body>
+<header><div class="brand">Kendriya Vidyalaya Sangathan · Mumbai Region</div><h1>SANGEET SADHANA</h1><div class="hindi">संगीत साधना — स्वर, लय और सृजन</div><p style="color:#e7edf8">Daily Feedback & Learning Reflection · 23–27 November 2026</p></header>
+<main><section class="panel"><h2>My Daily Learning Reflection</h2><p>Record what you learned each day and how you will use it in your music classroom. Your entries are saved in this browser on this device.</p>
+<form id="reflectionForm"><label for="name">Participant name</label><input id="name" required autocomplete="name" placeholder="Enter your name">
+<label for="day">Workshop day</label><select id="day" required><option value="">Select day</option><option>Day 1 · 23 November 2026</option><option>Day 2 · 24 November 2026</option><option>Day 3 · 25 November 2026</option><option>Day 4 · 26 November 2026</option><option>Day 5 · 27 November 2026</option></select>
+<label for="learning">What are the key ideas, skills or experiences you learned today?</label><textarea id="learning" required></textarea>
+<label for="application">How will you apply this learning in your classroom or school?</label><textarea id="application" required></textarea>
+<div class="actions"><button class="btn" type="submit">Save Daily Reflection</button><button class="btn secondary" type="button" id="export">Export My Reflections (CSV)</button></div></form></section>
+<section class="panel"><h2>My Saved Reflections</h2><div id="saved" class="muted">No reflections saved on this device.</div></section>
+<div class="foot">ZIET Mumbai · Sangeet Sadhana · 2026</div></main>
+<script>
+const key='sangeet_reflections';
+function read(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+function safe(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function render(){const a=read();document.getElementById('saved').innerHTML=a.length?a.map(r=>'<div class="entry"><b>'+safe(r.day)+' · '+safe(r.name)+'</b><p>'+safe(r.learning)+'</p><small>'+safe(r.application)+'</small></div>').join(''):'No reflections saved on this device.'}
+document.getElementById('reflectionForm').addEventListener('submit',e=>{e.preventDefault();const a=read();a.push({name:document.getElementById('name').value.trim(),day:document.getElementById('day').value,learning:document.getElementById('learning').value.trim(),application:document.getElementById('application').value.trim()});localStorage.setItem(key,JSON.stringify(a));e.target.reset();render();alert('Reflection saved on this device.')});
+document.getElementById('export').addEventListener('click',()=>{const rows=[['Name','Day','Learning','Application'],...read().map(r=>[r.name,r.day,r.learning,r.application])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Sangeet_Sadhana_Daily_Reflections.csv';a.click();URL.revokeObjectURL(a.href)});
+render();
+</script></body></html>
