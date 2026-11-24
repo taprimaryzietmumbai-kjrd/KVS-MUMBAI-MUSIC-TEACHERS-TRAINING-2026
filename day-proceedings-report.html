@@ -24,7 +24,7 @@
 <div class="field"><label>Hyperlink URL</label><input id="linkUrl" type="url" placeholder="https://example.com"></div>
 </div>
 <div class="actions" style="margin-top:8px"><button type="button" class="secondary" id="insertLinkBtn">Insert Hyperlink</button></div>
-<span class="hint">Add a clickable link at the cursor position, or paste a complete https:// URL directly into your report. Links will appear clickable in the generated PDF.</span></div><div class="field" style="margin-top:16px"><label>Upload supporting report file (Word/PDF)</label><input id="reportFile" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><span class="hint">Optional. Maximum file size: 8 MB.</span></div><div class="actions"><button id="submitBtn" type="submit">Submit Day Proceedings Report</button><button class="secondary" type="reset">Clear Form</button><a class="back" href="submissions.html">Back to Submissions</a></div><div id="status" class="status" role="status"></div></section></form></main>
+<span class="hint">Add a clickable link at the cursor position, or paste a complete https:// URL directly into your report. Links will appear clickable in the generated PDF.</span></div><div class="field" style="margin-top:16px"><label>Upload supporting report file (Word/PDF)</label><input id="reportFile" type="file"><span class="hint">Optional. Any file type can be selected. Uploading remains subject to Google Apps Script and Google Drive platform limits.</span></div><div class="actions"><button id="submitBtn" type="submit">Submit Day Proceedings Report</button><button class="secondary" type="reset">Clear Form</button><a class="back" href="submissions.html">Back to Submissions</a></div><div id="status" class="status" role="status"></div></section></form></main>
 <footer>ZIET Mumbai · KVS Mumbai Region · Sangeet Sadhana 2026</footer>
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
@@ -57,7 +57,7 @@ form.addEventListener("submit",async e=>{
  data.action="submitWorkshopReport";data.reportType="Day Proceedings Report";data.submittedAt=new Date().toISOString();
  const file=document.getElementById("reportFile").files[0];
  if(!data.reportText.trim()&&!file){statusBox.className="status err";statusBox.textContent="Please type your report or upload a Word/PDF file.";return;}
- if(file){if(file.size>8*1024*1024){statusBox.className="status err";statusBox.textContent="File exceeds the 8 MB limit.";return;}data.file={name:file.name,mimeType:file.type||"application/octet-stream",base64:await toBase64(file)};}
+ if(file){data.file={name:file.name,mimeType:file.type||"application/octet-stream",base64:await toBase64(file)};}
  btn.disabled=true;btn.textContent="Submitting…";waitingForResponse=true;
  const frame=document.createElement("iframe");frame.name="sangeetReportSubmitFrame";frame.style.display="none";document.body.appendChild(frame);
  const postForm=document.createElement("form");postForm.method="POST";postForm.action=SCRIPT_URL;postForm.target=frame.name;postForm.style.display="none";
