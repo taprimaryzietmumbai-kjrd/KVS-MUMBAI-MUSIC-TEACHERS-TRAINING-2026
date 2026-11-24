@@ -35,8 +35,8 @@ document.getElementById("insertLinkBtn").addEventListener("click",()=>{
  const label=document.getElementById("linkText").value.trim();
  const url=document.getElementById("linkUrl").value.trim();
  if(!label||!url){alert("Enter both hyperlink text and URL.");return;}
- if(!/^https?:\\/\\//i.test(url)){alert("Please enter a valid URL beginning with http:// or https://");return;}
- const snippet="["+label.replace(/[\\[\\]]/g,"")+"]("+url+")";
+ if(!/^https?:\/\//i.test(url)){alert("Please enter a valid URL beginning with http:// or https://");return;}
+ const snippet="["+label.replace(/[\[\]]/g,"")+"]("+url+")";
  const start=reportEditor.selectionStart,end=reportEditor.selectionEnd;
  reportEditor.setRangeText(snippet,start,end,"end");
  reportEditor.focus();
