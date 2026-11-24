@@ -48,7 +48,23 @@ window.addEventListener("message",event=>{
  const msg=event.data;
  if(!msg||msg.type!=="SANGEET_REPORT_RESULT"||!waitingForResponse)return;
  waitingForResponse=false;btn.disabled=false;btn.textContent="Submit Session Report";
- if(msg.data&&msg.data.ok){statusBox.className="status ok";statusBox.textContent="Submission received successfully. Reference: "+msg.data.reference+(msg.data.pdfUrl?" · PDF saved in Drive.":"")+(msg.data.uploadedFileUrl?" Supporting file saved in Drive.":"");form.reset();}
+ if(msg.data&&msg.data.ok){
+  statusBox.className="status ok";
+  statusBox.textContent="Submission received successfully. Reference: "+msg.data.reference;
+  if(msg.data.pdfUrl){
+   const pdfLink=document.createElement("a");
+   pdfLink.href=msg.data.pdfUrl;pdfLink.target="_blank";pdfLink.rel="noopener";
+   pdfLink.textContent="Open Saved PDF";pdfLink.style.display="inline-block";pdfLink.style.margin="10px 12px 0 0";pdfLink.style.fontWeight="700";
+   statusBox.appendChild(document.createElement("br"));statusBox.appendChild(pdfLink);
+  }
+  if(msg.data.uploadedFileUrl){
+   const fileLink=document.createElement("a");
+   fileLink.href=msg.data.uploadedFileUrl;fileLink.target="_blank";fileLink.rel="noopener";
+   fileLink.textContent="Open Uploaded Original File";fileLink.style.display="inline-block";fileLink.style.margin="10px 12px 0 0";fileLink.style.fontWeight="700";
+   statusBox.appendChild(fileLink);
+  }
+  form.reset();
+ }
  else{statusBox.className="status err";statusBox.textContent="Submission failed: "+((msg.data&&msg.data.message)||"Please try again.");}
 });
 form.addEventListener("submit",async e=>{
