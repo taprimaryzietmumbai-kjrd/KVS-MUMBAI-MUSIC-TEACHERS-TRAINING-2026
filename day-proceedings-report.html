@@ -18,12 +18,31 @@
 <div class="field"><label>Session No. of the Workshop <span class="req">*</span></label><input name="sessionNo" placeholder="e.g. Session 3 / Day 2" required></div>
 <div class="field full"><label>Facilitator of the Session <span class="req">*</span></label><input name="facilitator" required></div>
 </div></section>
-<section class="panel"><h2>Day Proceedings Report</h2><div class="field"><label>Write your report</label><textarea name="reportText" placeholder="Describe the day's proceedings chronologically, including sessions, activities, key highlights, participant engagement, outcomes and reflections…"></textarea><span class="hint">You can type or paste your complete report here.</span></div><div class="field" style="margin-top:16px"><label>Upload supporting report file (Word/PDF)</label><input id="reportFile" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><span class="hint">Optional. Maximum file size: 8 MB.</span></div><div class="actions"><button id="submitBtn" type="submit">Submit Day Proceedings Report</button><button class="secondary" type="reset">Clear Form</button><a class="back" href="submissions.html">Back to Submissions</a></div><div id="status" class="status" role="status"></div></section></form></main>
+<section class="panel"><h2>Day Proceedings Report</h2><div class="field"><label>Write your report</label><textarea name="reportText" placeholder="Describe the day's proceedings chronologically, including sessions, activities, key highlights, participant engagement, outcomes and reflections…"></textarea>
+<div class="grid" style="margin-top:10px">
+<div class="field"><label>Hyperlink text</label><input id="linkText" placeholder="e.g. Session presentation / Resource material"></div>
+<div class="field"><label>Hyperlink URL</label><input id="linkUrl" type="url" placeholder="https://example.com"></div>
+</div>
+<div class="actions" style="margin-top:8px"><button type="button" class="secondary" id="insertLinkBtn">Insert Hyperlink</button></div>
+<span class="hint">Add a clickable link at the cursor position, or paste a complete https:// URL directly into your report. Links will appear clickable in the generated PDF.</span></div><div class="field" style="margin-top:16px"><label>Upload supporting report file (Word/PDF)</label><input id="reportFile" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><span class="hint">Optional. Maximum file size: 8 MB.</span></div><div class="actions"><button id="submitBtn" type="submit">Submit Day Proceedings Report</button><button class="secondary" type="reset">Clear Form</button><a class="back" href="submissions.html">Back to Submissions</a></div><div id="status" class="status" role="status"></div></section></form></main>
 <footer>ZIET Mumbai · KVS Mumbai Region · Sangeet Sadhana 2026</footer>
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
 const form=document.getElementById("reportForm"),btn=document.getElementById("submitBtn"),statusBox=document.getElementById("status");
 const toBase64=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(",")[1]);r.onerror=reject;r.readAsDataURL(file)});
+const reportEditor=form.elements.reportText;
+document.getElementById("insertLinkBtn").addEventListener("click",()=>{
+ const label=document.getElementById("linkText").value.trim();
+ const url=document.getElementById("linkUrl").value.trim();
+ if(!label||!url){alert("Enter both hyperlink text and URL.");return;}
+ if(!/^https?:\\/\\//i.test(url)){alert("Please enter a valid URL beginning with http:// or https://");return;}
+ const snippet="["+label.replace(/[\\[\\]]/g,"")+"]("+url+")";
+ const start=reportEditor.selectionStart,end=reportEditor.selectionEnd;
+ reportEditor.setRangeText(snippet,start,end,"end");
+ reportEditor.focus();
+ document.getElementById("linkText").value="";
+ document.getElementById("linkUrl").value="";
+});
 let waitingForResponse=false;
 window.addEventListener("message",event=>{
  const msg=event.data;
