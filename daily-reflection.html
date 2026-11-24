@@ -32,7 +32,7 @@ document.getElementById('reflectionForm').addEventListener('submit',async e=>{
  const record={name:document.getElementById('name').value.trim(),day:document.getElementById('day').value,learning:document.getElementById('learning').value.trim(),application:document.getElementById('application').value.trim()};
  btn.disabled=true;status.textContent='Sending reflection to Google Drive…';
  try{const saved=await postToDrive({action:'saveReflection',...record});const a=read();a.push(record);localStorage.setItem(key,JSON.stringify(a));render();status.textContent='Saved successfully: '+saved.fileName; if(saved.fileUrl)status.innerHTML+=' <a href="'+saved.fileUrl+'" target="_blank" rel="noopener">Open PDF</a>';e.target.reset();}
- catch(err){status.textContent='Could not send the reflection. Please check your internet connection and try again.';}
+ catch(err){status.textContent='REFLECTION SAVE FAILED: '+(err&&err.message?err.message:String(err));}
  finally{btn.disabled=false;}
 });
 document.getElementById('notebookForm').addEventListener('submit',async e=>{
@@ -43,7 +43,7 @@ document.getElementById('notebookForm').addEventListener('submit',async e=>{
  try{const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('File could not be read.'));reader.readAsDataURL(file);});
  const uploaded=await postToDrive({action:'uploadNotebook',name:document.getElementById('noteName').value.trim(),day:document.getElementById('noteDay').value,fileName:file.name,dataUrl});
  status.textContent='Uploaded successfully: '+uploaded.fileName; if(uploaded.fileUrl)status.innerHTML+=' <a href="'+uploaded.fileUrl+'" target="_blank" rel="noopener">Open uploaded file</a>';e.target.reset();
- }catch(err){status.textContent='Upload could not be sent. Please try again.';}
+ }catch(err){status.textContent='NOTEBOOK UPLOAD FAILED: '+(err&&err.message?err.message:String(err));}
  finally{btn.disabled=false;}
 });
 document.getElementById('export').addEventListener('click',()=>{const rows=[['Name','Day','Learning','Application'],...read().map(r=>[r.name,r.day,r.learning,r.application])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Sangeet_Sadhana_Daily_Reflections.csv';a.click();URL.revokeObjectURL(a.href)});
