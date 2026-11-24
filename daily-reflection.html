@@ -10,20 +10,41 @@ h2{color:var(--navy);margin:0 0 8px}p,.muted{color:var(--muted)}label{display:bl
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{display:inline-block;border:0;border-radius:9px;background:var(--blue);color:#fff;text-decoration:none;padding:11px 16px;font:600 15px system-ui;cursor:pointer}.btn.secondary{background:#eaf0ff;color:#173b86}.entry{border-left:4px solid var(--gold);padding:12px 15px;background:#fbf8f1;border-radius:0 10px 10px 0;margin:12px 0}.entry p{margin:7px 0}.foot{text-align:center;color:var(--muted);font-size:13px;padding:20px}
 </style></head><body>
 <header><div class="brand">Kendriya Vidyalaya Sangathan · Mumbai Region</div><h1>SANGEET SADHANA</h1><div class="hindi">संगीत साधना — स्वर, लय और सृजन</div><p style="color:#e7edf8">Daily Feedback & Learning Reflection · 23–27 November 2026</p></header>
-<main><section class="panel"><h2>My Daily Learning Reflection</h2><p>Record what you learned each day and how you will use it in your music classroom. Your entries are saved in this browser on this device.</p>
+<main><section class="panel"><h2>My Daily Learning Reflection</h2><p>Record what you learned each day and how you will use it in your music classroom. Your reflections are submitted to the Sangeet Sadhana Google Drive folder through the Apps Script service.</p>
 <form id="reflectionForm"><label for="name">Participant name</label><input id="name" required autocomplete="name" placeholder="Enter your name">
 <label for="day">Workshop day</label><select id="day" required><option value="">Select day</option><option>Day 1 · 23 November 2026</option><option>Day 2 · 24 November 2026</option><option>Day 3 · 25 November 2026</option><option>Day 4 · 26 November 2026</option><option>Day 5 · 27 November 2026</option></select>
 <label for="learning">What are the key ideas, skills or experiences you learned today?</label><textarea id="learning" required></textarea>
 <label for="application">How will you apply this learning in your classroom or school?</label><textarea id="application" required></textarea>
-<div class="actions"><button class="btn" type="submit">Save Daily Reflection</button><button class="btn secondary" type="button" id="export">Export My Reflections (CSV)</button></div></form></section>
+<div class="actions"><button class="btn" type="submit" id="saveReflectionBtn">Save Reflection &amp; PDF to Drive</button><button class="btn secondary" type="button" id="export">Export My Reflections (CSV)</button></div><p id="reflectionStatus" class="muted" aria-live="polite"></p></form></section>
+<section class="panel"><h2>Upload My Notebook Notes</h2><p>Upload a photograph of your handwritten notes or a PDF. Files are stored in the Notebook Notes subfolder of the designated Google Drive folder. Maximum file size: 10 MB.</p><form id="notebookForm"><label for="noteName">Participant name</label><input id="noteName" required placeholder="Enter your name"><label for="noteDay">Workshop day</label><select id="noteDay" required><option value="">Select day</option><option>Day 1 · 23 November 2026</option><option>Day 2 · 24 November 2026</option><option>Day 3 · 25 November 2026</option><option>Day 4 · 26 November 2026</option><option>Day 5 · 27 November 2026</option></select><label for="notebookFile">Choose notebook photograph / PDF</label><input id="notebookFile" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" required><div class="actions"><button class="btn" id="uploadNotebookBtn" type="submit">Upload Notebook Notes to Drive</button></div><p id="notebookStatus" class="muted" aria-live="polite"></p></form></section>
 <section class="panel"><h2>My Saved Reflections</h2><div id="saved" class="muted">No reflections saved on this device.</div></section>
 <div class="foot">ZIET Mumbai · Sangeet Sadhana · 2026</div></main>
 <script>
 const key='sangeet_reflections';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec';
 function read(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
 function safe(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function render(){const a=read();document.getElementById('saved').innerHTML=a.length?a.map(r=>'<div class="entry"><b>'+safe(r.day)+' · '+safe(r.name)+'</b><p>'+safe(r.learning)+'</p><small>'+safe(r.application)+'</small></div>').join(''):'No reflections saved on this device.'}
-document.getElementById('reflectionForm').addEventListener('submit',e=>{e.preventDefault();const a=read();a.push({name:document.getElementById('name').value.trim(),day:document.getElementById('day').value,learning:document.getElementById('learning').value.trim(),application:document.getElementById('application').value.trim()});localStorage.setItem(key,JSON.stringify(a));e.target.reset();render();alert('Reflection saved on this device.')});
+async function postToDrive(payload){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}
+document.getElementById('reflectionForm').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=document.getElementById('saveReflectionBtn'),status=document.getElementById('reflectionStatus');
+ const record={name:document.getElementById('name').value.trim(),day:document.getElementById('day').value,learning:document.getElementById('learning').value.trim(),application:document.getElementById('application').value.trim()};
+ btn.disabled=true;status.textContent='Sending reflection to Google Drive…';
+ try{await postToDrive({action:'saveReflection',...record});const a=read();a.push(record);localStorage.setItem(key,JSON.stringify(a));render();status.textContent='Reflection submission sent. Please check the Daily Reflection PDFs folder in Google Drive for the generated PDF.';e.target.reset();}
+ catch(err){status.textContent='Could not send the reflection. Please check your internet connection and try again.';}
+ finally{btn.disabled=false;}
+});
+document.getElementById('notebookForm').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=document.getElementById('uploadNotebookBtn'),status=document.getElementById('notebookStatus'),file=document.getElementById('notebookFile').files[0];
+ if(!file)return;if(file.size>10*1024*1024){status.textContent='File is larger than 10 MB. Please choose a smaller file.';return;}
+ if(!['application/pdf','image/jpeg','image/png','image/webp'].includes(file.type)){status.textContent='Please upload a PDF, JPG, PNG or WEBP file.';return;}
+ btn.disabled=true;status.textContent='Uploading notebook notes to Google Drive…';
+ try{const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('File could not be read.'));reader.readAsDataURL(file);});
+ await postToDrive({action:'uploadNotebook',name:document.getElementById('noteName').value.trim(),day:document.getElementById('noteDay').value,fileName:file.name,dataUrl});
+ status.textContent='Notebook upload request sent. Please check the Notebook Notes folder in Google Drive.';e.target.reset();
+ }catch(err){status.textContent='Upload could not be sent. Please try again.';}
+ finally{btn.disabled=false;}
+});
 document.getElementById('export').addEventListener('click',()=>{const rows=[['Name','Day','Learning','Application'],...read().map(r=>[r.name,r.day,r.learning,r.application])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='Sangeet_Sadhana_Daily_Reflections.csv';a.click();URL.revokeObjectURL(a.href)});
 render();
 </script></body></html>
