@@ -83,7 +83,7 @@
      (x.role?"<br>Role: "+esc(x.role):"")+
      (x.school?"<br>School: "+esc(x.school):"")+'</div>'+
      (safeUrl?'<a class="submission-open" href="'+esc(safeUrl)+'" target="_blank" rel="noopener noreferrer">Open / View File ↗</a>':'<span class="submission-meta">File link unavailable</span>')+
-     (cat.id==='dayProceedingsCards'?'<button type="button" class="submission-edit" onclick="editProceedingsImage('+Number(x.rowNumber||0)+')">Edit / Add Photograph</button>':'')+
+     (cat.id==='dayProceedingsCards'?'<button type="button" class="submission-edit" onclick="editProceedingsImage('+Number(x.rowNumber||0)+')">Edit / Delete Submission</button>':'')+
      '</article>';
    }).join(""):'<div class="submission-empty">No submissions are currently available in this category.</div>';
   });
