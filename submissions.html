@@ -69,13 +69,11 @@
     const safeUrl=/^https:\/\//i.test(url)?url:"";
     const participant=String(x.participantName||x.name||"");
     const dayLabel=String(x.workshopDay||x.day||"");
-    // This one image belongs ONLY to Anand Kumar Srivastava's Day 1 report (23 Nov 2026).
-    const isDay1ImageReport=/day proceedings/i.test(x.submissionType||x.type||"") &&
-      /2026-11-23|23\/11\/2026|23 Nov 2026/i.test(dayLabel) &&
-      /anand kumar srivastava/i.test(participant);
-    const previewUrl=isDay1ImageReport?(x.imagePreviewUrl||"https://i.ibb.co/3YvCMN2L/image.png"):"";
+    // Each preview URL belongs to this exact submission row; no day or participant is hard-coded.
+    const previewUrl=/^https:\/\//i.test(String(x.imagePreviewUrl||""))
+      ? String(x.imagePreviewUrl) : "";
     const preview=previewUrl
-      ? '<a class="submission-preview" href="'+previewUrl+'" target="_blank" rel="noopener noreferrer" aria-label="Open Day 1 report image"><img src="'+previewUrl+'" alt="Day 1 handwritten proceedings report, 23 November 2026"><div class="submission-preview-label">Day 1 report image · 23 November 2026 — open full image</div></a>'
+      ? '<a class="submission-preview" href="'+previewUrl+'" target="_blank" rel="noopener noreferrer" aria-label="Open participant report image"><img src="'+previewUrl+'" alt="Participant-uploaded proceedings report image"><div class="submission-preview-label">Participant-uploaded report image — open full image</div></a>'
       : "";
     return '<article class="submission-item">'+preview+'<h4>'+esc(participant||"Participant")+'</h4>'+
      '<div class="submission-meta">'+esc(dayLabel)+
