@@ -15,6 +15,7 @@
 .submission-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .submission-item{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;min-width:0}
 .submission-item h4{margin:0 0 6px;color:#173b86;font-size:16px;overflow-wrap:anywhere}
+.submission-preview{display:block;margin:0 0 12px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#f8fafc;max-width:100%}.submission-preview img{display:block;width:100%;max-height:360px;object-fit:contain;background:#f8fafc}.submission-preview-label{font-size:11px;color:var(--muted);padding:5px 8px;background:#f8fafc}
 .submission-meta{font-size:12px;color:var(--muted);line-height:1.6}
 .submission-open{display:inline-block;margin-top:11px;background:var(--navy);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px}
 .submission-empty{border:1px dashed #cbd5e1;border-radius:10px;padding:14px;color:#64748b;font-size:13px}
@@ -66,8 +67,18 @@
    box.innerHTML=rows.length?rows.map(x=>{
     const url=x.fileUrl||x.url||"";
     const safeUrl=/^https:\/\//i.test(url)?url:"";
-    return '<article class="submission-item"><h4>'+esc(x.participantName||x.name||"Participant")+'</h4>'+
-     '<div class="submission-meta">'+esc(x.workshopDay||x.day||"")+
+    const participant=String(x.participantName||x.name||"");
+    const dayLabel=String(x.workshopDay||x.day||"");
+    // This one image belongs ONLY to Anand Kumar Srivastava's Day 1 report (23 Nov 2026).
+    const isDay1ImageReport=/day proceedings/i.test(x.submissionType||x.type||"") &&
+      /2026-11-23|23\/11\/2026|23 Nov 2026/i.test(dayLabel) &&
+      /anand kumar srivastava/i.test(participant);
+    const previewUrl=isDay1ImageReport?"https://i.ibb.co/3YvCMN2L/image.png":"";
+    const preview=previewUrl
+      ? '<a class="submission-preview" href="'+previewUrl+'" target="_blank" rel="noopener noreferrer" aria-label="Open Day 1 report image"><img src="'+previewUrl+'" alt="Day 1 handwritten proceedings report, 23 November 2026"><div class="submission-preview-label">Day 1 report image · 23 November 2026 — open full image</div></a>'
+      : "";
+    return '<article class="submission-item">'+preview+'<h4>'+esc(participant||"Participant")+'</h4>'+
+     '<div class="submission-meta">'+esc(dayLabel)+
      (x.submittedAt||x.timestamp?" · "+esc(x.submittedAt||x.timestamp):"")+
      (x.role?"<br>Role: "+esc(x.role):"")+
      (x.school?"<br>School: "+esc(x.school):"")+'</div>'+
