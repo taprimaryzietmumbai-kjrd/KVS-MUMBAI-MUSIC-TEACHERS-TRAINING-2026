@@ -147,8 +147,8 @@
    const url=document.getElementById('edLinkUrl').value.trim();
    const editor=document.getElementById('edReport');
    if(!label||!url){alert('Enter both hyperlink text and URL.');return;}
-   if(!/^https?:\\/\\//i.test(url)){alert('Please enter a valid URL beginning with https://');return;}
-   const safeLabel=label.replace(/[\\[\\]]/g,'');
+   if(!(url.startsWith('https://')||url.startsWith('http://'))){alert('Please enter a valid URL beginning with https://');return;}
+   const safeLabel=label.replace(/[\[\]]/g,'');
    const snippet='['+safeLabel+']('+url+')';
    editor.setRangeText(snippet,editor.selectionStart,editor.selectionEnd,'end');
    editor.focus();
