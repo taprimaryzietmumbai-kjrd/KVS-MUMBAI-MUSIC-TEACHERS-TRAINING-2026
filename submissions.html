@@ -21,6 +21,8 @@
 .submission-empty{border:1px dashed #cbd5e1;border-radius:10px;padding:14px;color:#64748b;font-size:13px}
 .public-note{font-size:12px;color:#92400e;background:#fff8e8;border:1px solid #f1d69c;border-radius:9px;padding:11px;margin-top:18px}
 @media(max-width:680px){.submission-cards{grid-template-columns:1fr}.visible-submissions{padding:15px}}
+
+#editModal{display:none;position:fixed;inset:0;z-index:9999;background:#0f172acc;padding:18px;overflow:auto}#editModal .edit-box{max-width:850px;margin:25px auto;background:#fff;border-radius:16px;padding:22px;box-shadow:0 15px 50px #0005}#editModal h2{color:#172554;margin-top:0}.edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.edit-field{display:flex;flex-direction:column;gap:5px}.edit-field.full{grid-column:1/-1}.edit-field label{font-weight:700;color:#24345a}.edit-field input,.edit-field textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}.edit-field textarea{min-height:190px}.edit-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.edit-actions button{border:0;border-radius:8px;padding:11px 15px;font-weight:750;cursor:pointer}.edit-save{background:#172554;color:#fff}.edit-cancel{background:#e8edf5;color:#172554}.edit-danger{background:#991b1b;color:#fff}.edit-status{margin-top:12px;padding:10px;border-radius:8px;background:#f1f5f9;color:#334155;display:none}@media(max-width:650px){.edit-grid{grid-template-columns:1fr}.edit-field.full{grid-column:auto}}
 </style></head><body>
 <header><div class="brand">Kendriya Vidyalaya Sangathan · ZIET Mumbai</div><h1>PARTICIPANT'S SUBMISSIONS</h1><div class="hindi">प्रतिभागियों के शैक्षणिक योगदान एवं प्रतिपुष्टि</div><p class="sub"><b>SANGEET SADHANA · संगीत साधना — स्वर, लय और सृजन</b><br>Mass Saturation Training for Music Teachers · 23–27 November 2026</p></header>
 <main class="wrap"><section class="intro"><b>Welcome, Participants!</b><p>Use this dedicated page to access the key submission and feedback applications associated with the workshop. Please complete the relevant activity and submit your responses through the respective application.</p></section>
@@ -46,7 +48,7 @@
     <section class="submission-category"><h3>Day Proceedings Reports</h3><div class="submission-cards" id="dayProceedingsCards"></div></section>
     <section class="submission-category"><h3>Session Reports</h3><div class="submission-cards" id="sessionReportCards"></div></section>
   </div>
-  <p class="public-note">Public access: submission cards and their linked files are intended to be viewable by anyone who visits this page. Please do not upload confidential or sensitive personal information.</p>
+  <div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle"><div class="edit-box"><h2 id="editTitle">Edit Day Proceedings Submission</h2><p>Update the existing record. The previous PDF and uploaded files will be retained in Drive.</p><form id="fullEditForm"><input type="hidden" name="rowNumber" id="editRowNumber"><div class="edit-grid"><div class="edit-field"><label>Participant Name *</label><input name="participantName" id="edName" required></div><div class="edit-field"><label>Workshop Name</label><input name="workshopName" id="edWorkshop"></div><div class="edit-field"><label>Target Group *</label><input name="targetGroup" id="edTarget" required></div><div class="edit-field"><label>Participated As *</label><input name="participatedAs" id="edRole" required></div><div class="edit-field"><label>Organization / School *</label><input name="vidyalaya" id="edSchool" required></div><div class="edit-field"><label>Region *</label><input name="region" id="edRegion" required></div><div class="edit-field"><label>Submission Date *</label><input name="submissionDate" id="edDate" required></div><div class="edit-field"><label>Session No. / Day *</label><input name="sessionNo" id="edSession" required></div><div class="edit-field full"><label>Facilitator *</label><input name="facilitator" id="edFacilitator" required></div><div class="edit-field full"><label>Proceedings Report</label><textarea name="reportText" id="edReport"></textarea></div><div class="edit-field"><label>Replace Supporting Word/PDF File</label><input type="file" id="edFile" accept=".pdf,.doc,.docx"></div><div class="edit-field"><label>Replace Photograph</label><input type="file" id="edImage" accept="image/jpeg,image/png,image/webp"></div><div class="edit-field full"><label><input type="checkbox" id="removeFile" style="width:auto"> Remove existing supporting file</label><label><input type="checkbox" id="removeImage" style="width:auto"> Remove existing photograph</label><div id="editExistingLinks" class="submission-meta"></div></div></div><div class="edit-actions"><button class="edit-save" id="saveFullEdit" type="submit">Save Changes & Regenerate PDF</button><button class="edit-cancel" type="button" id="cancelFullEdit">Cancel</button><button class="edit-danger" type="button" id="deleteFullEdit">Delete Submission</button></div><div id="fullEditStatus" class="edit-status" role="status"></div></form></div></div><p class="public-note">Public access: submission cards and their linked files are intended to be viewable by anyone who visits this page. Please do not upload confidential or sensitive personal information.</p>
 </section>
 <div class="note"><b>Note:</b> The Participants Hub is provided as a support and resource link. Session Report and Day Proceedings Report are separate submissions. This page is a central access point and does not itself collect or store responses.</div><a class="back" href="index.html">← Back to Sangeet Sadhana Dashboard</a></main><footer>ZIET Mumbai · KVS Mumbai Region · Sangeet Sadhana 2026</footer>
 <script>
@@ -102,23 +104,68 @@
   document.body.appendChild(script);
  }
 
+
+ const modal=document.getElementById('editModal'), editForm=document.getElementById('fullEditForm'), editStatus=document.getElementById('fullEditStatus');
+ let activeEditPin='', activeEditRow=0, editBusy=false;
+ function showEditStatus(msg){editStatus.style.display='block';editStatus.textContent=msg;}
+ function postReportAction(payload,done){
+   const frame=document.createElement('iframe');frame.name='sangeetEditActionFrame';frame.style.display='none';document.body.appendChild(frame);
+   const f=document.createElement('form');f.method='POST';f.action=API_URL;f.target=frame.name;f.style.display='none';
+   const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(payload);f.appendChild(i);document.body.appendChild(f);
+   const handler=ev=>{const m=ev.data;if(!m||m.type!=='SANGEET_REPORT_RESULT')return;window.removeEventListener('message',handler);f.remove();frame.remove();done(m.data||{});};
+   window.addEventListener('message',handler);f.submit();
+   setTimeout(()=>{window.removeEventListener('message',handler);f.remove();frame.remove();if(editBusy){editBusy=false;showEditStatus('No confirmation received. Please refresh and check the record before retrying.');}},60000);
+ }
  window.editProceedingsImage=function(rowNumber){
-  if(!rowNumber||rowNumber<2){alert('This record cannot be edited from the current listing. Refresh and try again.');return;}
-  const pin=prompt('Enter the Day Proceedings edit PIN:');
-  if(pin===null)return;
-  const picker=document.createElement('input');picker.type='file';picker.accept='image/jpeg,image/png,image/webp';
-  picker.onchange=()=>{const file=picker.files&&picker.files[0];if(!file)return;
-   if(file.size>5*1024*1024){alert('Please choose an image smaller than 5 MB.');return;}
-   const reader=new FileReader();reader.onload=()=>{
-    const payload={action:'editDayProceedingsImage',requestId:'edit_'+Date.now(),rowNumber:rowNumber,editPin:pin,reportImage:{name:file.name,mimeType:file.type,base64:String(reader.result).split(',')[1]}};
-    const frame=document.createElement('iframe');frame.name='sangeetEditFrame';frame.style.display='none';document.body.appendChild(frame);
-    const f=document.createElement('form');f.method='POST';f.action=API_URL;f.target=frame.name;f.style.display='none';
-    const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(payload);f.appendChild(i);document.body.appendChild(f);
-    const handler=function(ev){const m=ev.data;if(!m||m.type!=='SANGEET_REPORT_RESULT')return;window.removeEventListener('message',handler);f.remove();frame.remove();if(m.data&&m.data.ok){alert('Existing report updated. The revised PDF is ready.');load();}else{alert('Update failed: '+((m.data&&m.data.message)||'Please try again.'));}};
-    window.addEventListener('message',handler);f.submit();setTimeout(()=>{window.removeEventListener('message',handler);f.remove();frame.remove();},60000);
-   };reader.readAsDataURL(file);
-  };picker.click();
+   if(!rowNumber||rowNumber<2){alert('The record number is unavailable. Refresh the list and try again.');return;}
+   const pin=prompt('Enter the Day Proceedings edit PIN:');if(pin===null)return;
+   activeEditPin=pin;activeEditRow=Number(rowNumber);editBusy=true;showEditStatus('Loading saved submission details…');modal.style.display='block';
+   postReportAction({action:'getDayProceedingsFull',requestId:'load_'+Date.now(),rowNumber:activeEditRow,editPin:activeEditPin},data=>{
+     editBusy=false;
+     if(!data.ok){modal.style.display='none';alert('Could not load record: '+(data.message||'Unknown error'));return;}
+     const r=data.record||{};
+     document.getElementById('editRowNumber').value=activeEditRow;
+     document.getElementById('edName').value=r.participantName||'';
+     document.getElementById('edWorkshop').value=r.workshopName||'';
+     document.getElementById('edTarget').value=r.targetGroup||'';
+     document.getElementById('edRole').value=r.participatedAs||'';
+     document.getElementById('edSchool').value=r.vidyalaya||'';
+     document.getElementById('edRegion').value=r.region||'';
+     document.getElementById('edDate').value=r.submissionDate||'';
+     document.getElementById('edSession').value=r.sessionNo||'';
+     document.getElementById('edFacilitator').value=r.facilitator||'';
+     document.getElementById('edReport').value=r.reportText||'';
+     document.getElementById('editExistingLinks').innerHTML=(r.pdfUrl?'<a target="_blank" rel="noopener" href="'+r.pdfUrl+'">Current PDF</a> ':'')+(r.supportingFileUrl?'<a target="_blank" rel="noopener" href="'+r.supportingFileUrl+'">Current supporting file</a> ':'')+(r.imagePreviewUrl?'<a target="_blank" rel="noopener" href="'+r.imagePreviewUrl+'">Current photograph</a>':'');
+     editStatus.style.display='none';
+   });
  };
+ document.getElementById('cancelFullEdit').addEventListener('click',()=>{modal.style.display='none';editForm.reset();});
+ editForm.addEventListener('submit',async ev=>{
+   ev.preventDefault();if(editBusy)return;
+   const payload={action:'editDayProceedingsFull',requestId:'full_edit_'+Date.now(),rowNumber:activeEditRow,editPin:activeEditPin,
+    participantName:document.getElementById('edName').value,workshopName:document.getElementById('edWorkshop').value,
+    targetGroup:document.getElementById('edTarget').value,participatedAs:document.getElementById('edRole').value,
+    vidyalaya:document.getElementById('edSchool').value,region:document.getElementById('edRegion').value,
+    submissionDate:document.getElementById('edDate').value,sessionNo:document.getElementById('edSession').value,
+    facilitator:document.getElementById('edFacilitator').value,reportText:document.getElementById('edReport').value,
+    removeSupportingFile:document.getElementById('removeFile').checked,removeReportImage:document.getElementById('removeImage').checked};
+   const file=document.getElementById('edFile').files[0],img=document.getElementById('edImage').files[0];
+   const toB64=file=>new Promise((resolve,reject)=>{const rd=new FileReader();rd.onload=()=>resolve(String(rd.result).split(',')[1]);rd.onerror=reject;rd.readAsDataURL(file);});
+   try{
+     if(file){if(file.size>10*1024*1024)throw new Error('Supporting file must be 10 MB or smaller.');payload.file={name:file.name,mimeType:file.type||'application/octet-stream',base64:await toB64(file)};}
+     if(img){if(!/^image\/(jpeg|png|webp)$/i.test(img.type))throw new Error('Photograph must be JPG, PNG or WEBP.');if(img.size>5*1024*1024)throw new Error('Photograph must be 5 MB or smaller.');payload.reportImage={name:img.name,mimeType:img.type,base64:await toB64(img)};}
+     editBusy=true;showEditStatus('Saving changes and regenerating PDF…');
+     postReportAction(payload,data=>{editBusy=false;if(data.ok){showEditStatus('Saved successfully. Revised PDF is ready.');load();setTimeout(()=>{modal.style.display='none';editForm.reset();},900);}else showEditStatus('Save failed: '+(data.message||'Unknown error'));});
+   }catch(err){showEditStatus(err.message||String(err));}
+ });
+ document.getElementById('deleteFullEdit').addEventListener('click',()=>{
+   if(!confirm('Move this submission to Deleted? The row and Drive files will be retained for recovery.'))return;
+   if(editBusy)return;editBusy=true;showEditStatus('Deleting submission…');
+   postReportAction({action:'deleteDayProceedings',requestId:'delete_'+Date.now(),rowNumber:activeEditRow,editPin:activeEditPin},data=>{
+     editBusy=false;if(data.ok){showEditStatus('Submission deleted from the public listing. Files retained.');load();setTimeout(()=>{modal.style.display='none';editForm.reset();},900);}else showEditStatus('Delete failed: '+(data.message||'Unknown error'));
+   });
+ });
+
 
  document.getElementById("refreshSubmissions").addEventListener("click",load);
  load();
