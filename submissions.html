@@ -17,7 +17,7 @@
 .submission-item h4{margin:0 0 6px;color:#173b86;font-size:16px;overflow-wrap:anywhere}
 .submission-preview{display:block;margin:0 0 12px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#f8fafc;max-width:100%}.submission-preview img{display:block;width:100%;max-height:360px;object-fit:contain;background:#f8fafc}.submission-preview-label{font-size:11px;color:var(--muted);padding:5px 8px;background:#f8fafc}
 .submission-meta{font-size:12px;color:var(--muted);line-height:1.6}
-.submission-open{display:inline-block;margin-top:11px;background:var(--navy);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px}
+.submission-open{display:inline-block;margin-top:11px;background:var(--navy);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px}.submission-edit{display:inline-block;margin:11px 0 0 8px;background:#f1f5f9;color:#172554;border:1px solid #cbd5e1;padding:8px 12px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
 .submission-empty{border:1px dashed #cbd5e1;border-radius:10px;padding:14px;color:#64748b;font-size:13px}
 .public-note{font-size:12px;color:#92400e;background:#fff8e8;border:1px solid #f1d69c;border-radius:9px;padding:11px;margin-top:18px}
 @media(max-width:680px){.submission-cards{grid-template-columns:1fr}.visible-submissions{padding:15px}}
@@ -81,6 +81,7 @@
      (x.role?"<br>Role: "+esc(x.role):"")+
      (x.school?"<br>School: "+esc(x.school):"")+'</div>'+
      (safeUrl?'<a class="submission-open" href="'+esc(safeUrl)+'" target="_blank" rel="noopener noreferrer">Open / View File ↗</a>':'<span class="submission-meta">File link unavailable</span>')+
+     (cat.id==='dayProceedingsCards'?'<button type="button" class="submission-edit" onclick="editProceedingsImage('+Number(x.rowNumber||0)+')">Edit / Add Photograph</button>':'')+
      '</article>';
    }).join(""):'<div class="submission-empty">No submissions are currently available in this category.</div>';
   });
@@ -100,6 +101,25 @@
   script.src=API_URL+"?action=publicSubmissions&callback="+encodeURIComponent(cb);
   document.body.appendChild(script);
  }
+
+ window.editProceedingsImage=function(rowNumber){
+  if(!rowNumber||rowNumber<2){alert('This record cannot be edited from the current listing. Refresh and try again.');return;}
+  const pin=prompt('Enter the Day Proceedings edit PIN:');
+  if(pin===null)return;
+  const picker=document.createElement('input');picker.type='file';picker.accept='image/jpeg,image/png,image/webp';
+  picker.onchange=()=>{const file=picker.files&&picker.files[0];if(!file)return;
+   if(file.size>5*1024*1024){alert('Please choose an image smaller than 5 MB.');return;}
+   const reader=new FileReader();reader.onload=()=>{
+    const payload={action:'editDayProceedingsImage',requestId:'edit_'+Date.now(),rowNumber:rowNumber,editPin:pin,reportImage:{name:file.name,mimeType:file.type,base64:String(reader.result).split(',')[1]}};
+    const frame=document.createElement('iframe');frame.name='sangeetEditFrame';frame.style.display='none';document.body.appendChild(frame);
+    const f=document.createElement('form');f.method='POST';f.action=API_URL;f.target=frame.name;f.style.display='none';
+    const i=document.createElement('input');i.type='hidden';i.name='payload';i.value=JSON.stringify(payload);f.appendChild(i);document.body.appendChild(f);
+    const handler=function(ev){const m=ev.data;if(!m||m.type!=='SANGEET_REPORT_RESULT')return;window.removeEventListener('message',handler);f.remove();frame.remove();if(m.data&&m.data.ok){alert('Existing report updated. The revised PDF is ready.');load();}else{alert('Update failed: '+((m.data&&m.data.message)||'Please try again.'));}};
+    window.addEventListener('message',handler);f.submit();setTimeout(()=>{window.removeEventListener('message',handler);f.remove();frame.remove();},60000);
+   };reader.readAsDataURL(file);
+  };picker.click();
+ };
+
  document.getElementById("refreshSubmissions").addEventListener("click",load);
  load();
 })();
