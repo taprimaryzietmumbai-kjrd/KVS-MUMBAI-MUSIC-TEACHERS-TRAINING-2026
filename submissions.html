@@ -73,7 +73,7 @@
     const isDay1ImageReport=/day proceedings/i.test(x.submissionType||x.type||"") &&
       /2026-11-23|23\/11\/2026|23 Nov 2026/i.test(dayLabel) &&
       /anand kumar srivastava/i.test(participant);
-    const previewUrl=isDay1ImageReport?"https://i.ibb.co/3YvCMN2L/image.png":"";
+    const previewUrl=isDay1ImageReport?(x.imagePreviewUrl||"https://i.ibb.co/3YvCMN2L/image.png"):"";
     const preview=previewUrl
       ? '<a class="submission-preview" href="'+previewUrl+'" target="_blank" rel="noopener noreferrer" aria-label="Open Day 1 report image"><img src="'+previewUrl+'" alt="Day 1 handwritten proceedings report, 23 November 2026"><div class="submission-preview-label">Day 1 report image · 23 November 2026 — open full image</div></a>'
       : "";
