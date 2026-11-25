@@ -71,7 +71,7 @@ window.addEventListener("message",event=>{
 form.addEventListener("submit",async e=>{
  e.preventDefault();statusBox.className="status";statusBox.textContent="";
  const data=Object.fromEntries(new FormData(form).entries());
- data.action="submitWorkshopReport";data.reportType="Day Proceedings Report";data.submittedAt=new Date().toISOString();
+ data.action="submitWorkshopReport";data.reportType="Day Proceedings Report";data.submittedAt=new Date().toISOString();data.requestId="report_"+Date.now()+"_"+Math.random().toString(36).slice(2,10);
  const file=document.getElementById("reportFile").files[0];
  if(!data.reportText.trim()&&!file){statusBox.className="status err";statusBox.textContent="Please type your report or upload a Word/PDF file.";return;}
  if(file){data.file={name:file.name,mimeType:file.type||"application/octet-stream",base64:await toBase64(file)};}
