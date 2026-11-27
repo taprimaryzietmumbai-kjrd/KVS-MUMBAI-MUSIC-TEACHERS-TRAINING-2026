@@ -43,6 +43,7 @@
 <button class="nav" data-section="resources">▤ Resources<small>Presentations and media</small></button>
 <a class="nav" href="daily-reflection.html" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none">✎ Daily Reflection<small>Open separate reflection page ↗</small></a>
 <button class="nav" data-section="feedback">✎ Feedback & reflection<small>Participant reflections</small></button>
+<button class="nav" data-section="morning-reports">☀ Morning Presentation Reports<small>Submit, view & download reports</small></button>
 <button class="nav" data-section="glimpses">▧ Glimpses & reports<small>Photos and daily reports</small></button>
 </nav>
 <div class="content">
@@ -128,6 +129,29 @@
 <div class="panel"><div class="eyebrow">Application 1</div><h2>ZIET Mumbai – Short Duration Workshop Feedback</h2><p class="muted">Complete the workshop-level feedback form below.</p><div class="actions"><a class="btn" href="https://taprimaryzietmumbai-kjrd.github.io/ZIET-Mumbai-SDWS-Feedback/" target="_blank" rel="noopener noreferrer">Open this form in a new tab ↗</a></div><iframe title="ZIET Mumbai Short Duration Workshop Feedback" src="https://taprimaryzietmumbai-kjrd.github.io/ZIET-Mumbai-SDWS-Feedback/" loading="lazy" style="width:100%;height:950px;border:1px solid #e2e8f0;border-radius:10px;background:#fff"></iframe></div>
 <div class="panel"><div class="eyebrow">Application 2</div><h2>KVS Workshop Sessions Feedback</h2><p class="muted">Complete feedback for individual sessions and resource persons.</p><div class="actions"><a class="btn secondary" href="https://taprimaryzietmumbai-kjrd.github.io/KVS-Workshop-Sessions-Feedback/" target="_blank" rel="noopener noreferrer">Open this form in a new tab ↗</a></div><iframe title="KVS Workshop Sessions Feedback" src="https://taprimaryzietmumbai-kjrd.github.io/KVS-Workshop-Sessions-Feedback/" loading="lazy" style="width:100%;height:1400px;border:1px solid #e2e8f0;border-radius:10px;background:#fff"></iframe></div>
 </section>
+<section id="morning-reports" class="section">
+<div class="panel"><div class="eyebrow">Morning presentation reports · participant submissions</div><h2>Morning Presentation Reports</h2>
+<p class="muted">Submit a report of your morning presentation. On successful submission, a PDF copy will be saved in the ZIET Mumbai Google Drive repository and will appear in the report library below.</p>
+<div class="notice">Please submit one report for each presentation. Enter accurate participant and session details. You may include a link to your presentation file or supporting resource.</div>
+<form id="morningReportForm">
+<div class="formgrid">
+<div><label for="mrName">Presenter / Participant Name *</label><input id="mrName" required placeholder="Full name"></div>
+<div><label for="mrRegion">KVS Region *</label><input id="mrRegion" required placeholder="e.g. Mumbai Region"></div>
+<div><label for="mrSchool">Kendriya Vidyalaya / Organisation *</label><input id="mrSchool" required placeholder="Name of Vidyalaya"></div>
+<div><label for="mrDate">Date of Presentation *</label><input id="mrDate" type="date" required min="2026-11-23" max="2026-11-27"></div>
+</div>
+<label for="mrTitle">Presentation Title / Topic *</label><input id="mrTitle" required placeholder="Title of the morning presentation">
+<label for="mrSummary">Brief Report of the Presentation *</label><textarea id="mrSummary" required rows="6" placeholder="Describe the purpose, key points, activities, demonstrations and discussion..."></textarea>
+<label for="mrLearning">Key Learning / Takeaways *</label><textarea id="mrLearning" required rows="4" placeholder="What were the major learning points?"></textarea>
+<label for="mrApplication">Relevance to Music Teaching / Classroom Application</label><textarea id="mrApplication" rows="4" placeholder="How can the ideas be used in teaching-learning practice?"></textarea>
+<label for="mrResource">Presentation / Supporting Resource Link (optional)</label><input id="mrResource" type="url" placeholder="Paste a shareable Google Drive / YouTube / other link">
+<div class="actions"><button class="btn" id="mrSubmitBtn" type="submit">Submit Morning Presentation Report</button><button class="btn ghost" type="reset">Clear form</button></div>
+<div id="mrSubmitStatus" class="notice" aria-live="polite" style="margin-top:14px">Your report will be saved as a PDF in the shared Drive repository after successful submission.</div>
+</form></div>
+<div class="panel"><div class="eyebrow">Shared repository</div><h2>Submitted Morning Presentation Reports</h2><p class="muted">Reports successfully submitted through this form will be listed here with links to open or download their PDF copies.</p>
+<div class="actions"><button class="btn secondary" id="mrRefreshBtn" type="button">↻ Refresh reports</button></div>
+<div id="morningReportList" class="grid" style="margin-top:14px"><div class="empty">Loading submitted reports…</div></div>
+</div></section>
 <section id="glimpses" class="section"><div class="panel"><div class="eyebrow">Documentation</div><h2>Workshop glimpses & daily reports</h2><p class="muted">A space for curated photographs, videos, daily reports and presentation links.</p><div class="notice">Please add only photographs and materials approved for sharing. Use a public or institutionally accessible link.</div><form id="glimpseForm"><label for="gtitle">Title / description *</label><input id="gtitle" required placeholder="e.g. Day 1 — Inaugural session"><label for="gurl">Photo album, video or report URL *</label><input id="gurl" type="url" required placeholder="https://..."><div class="actions"><button class="btn" type="submit">Add documentation link</button></div></form></div><div class="panel"><div id="glimpseList" class="grid"></div><div id="glimpseEmpty" class="empty">Workshop documentation links will appear here.</div></div></section>
 </div></div>
 <div class="foot">Kendriya Vidyalaya Sangathan · ZIET Mumbai<br>Sangeet Sadhana | Mass Saturation Training for Music Teachers | 2026</div>
@@ -152,6 +176,47 @@ $('resourceForm').addEventListener('submit',e=>{e.preventDefault();let a=get('re
 
 function renderGlimpses(){let a=get('glimpses');$('glimpseList').innerHTML=a.map((r,i)=>'<div class="tile resource"><h3>'+esc(r.title)+'</h3><a href="'+esc(r.url)+'" target="_blank" rel="noopener">Open link ↗</a><div class="actions"><button class="btn danger" onclick="removeItem(\'glimpses\','+i+')">Remove</button></div></div>').join('');$('glimpseEmpty').style.display=a.length?'none':'block'}
 $('glimpseForm').addEventListener('submit',e=>{e.preventDefault();let a=get('glimpses');a.push({title:$('gtitle').value,url:$('gurl').value});put('glimpses',a);e.target.reset();renderGlimpses()});
+// Morning Presentation Reports: save to Drive and refresh the shared report repository.
+const MORNING_REPORTS_API = "https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
+function morningReportJsonp(action){
+ return new Promise((resolve,reject)=>{
+  const cb='morningReportsCb'+Date.now()+Math.floor(Math.random()*10000),s=document.createElement('script');let done=false;
+  const cleanup=()=>{if(done)return;done=true;clearTimeout(timer);s.remove();try{delete window[cb]}catch(e){}};
+  const timer=setTimeout(()=>{cleanup();reject(new Error('The report service timed out.'));},20000);
+  window[cb]=d=>{cleanup();d&&d.ok?resolve(d):reject(new Error(d&&d.message||'Unable to load reports.'));};
+  s.onerror=()=>{cleanup();reject(new Error('Could not connect to the report service.'));};
+  s.src=MORNING_REPORTS_API+'?action='+encodeURIComponent(action)+'&callback='+encodeURIComponent(cb);
+  document.body.appendChild(s);
+ });
+}
+function renderMorningReports(items){
+ const box=$('morningReportList');
+ if(!items||!items.length){box.innerHTML='<div class="empty">No morning presentation reports have been submitted yet.</div>';return;}
+ box.innerHTML=items.map((r,i)=>'<div class="tile resource"><span class="tag">'+esc(r.date||'Presentation report')+'</span><h3>'+esc(r.title||'Morning Presentation Report')+'</h3><p><b>'+esc(r.name||'')+'</b><br><span class="muted">'+esc(r.school||'')+' · '+esc(r.region||'')+'</span></p><a href="'+esc(r.url||'#')+'" target="_blank" rel="noopener noreferrer">Open / download PDF ↗</a>'+(r.resource?'<p><a href="'+esc(r.resource)+'" target="_blank" rel="noopener noreferrer">Supporting presentation / resource ↗</a></p>':'')+'</div>').join('');
+}
+async function refreshMorningReports(){
+ const box=$('morningReportList');box.innerHTML='<div class="empty">Loading submitted reports…</div>';
+ try{const d=await morningReportJsonp('listMorningReports');renderMorningReports(d.reports||[]);}
+ catch(e){box.innerHTML='<div class="notice">Unable to load the report library: '+esc(e.message)+'</div>';}
+}
+$('morningReportForm').addEventListener('submit',async e=>{
+ e.preventDefault();const btn=$('mrSubmitBtn'),status=$('mrSubmitStatus');
+ const payload={action:'saveMorningReport',requestId:'MR-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),
+ name:$('mrName').value.trim(),region:$('mrRegion').value.trim(),school:$('mrSchool').value.trim(),
+ date:$('mrDate').value,title:$('mrTitle').value.trim(),summary:$('mrSummary').value.trim(),
+ learning:$('mrLearning').value.trim(),application:$('mrApplication').value.trim(),resource:$('mrResource').value.trim()};
+ btn.disabled=true;status.textContent='Submitting report and creating your PDF…';
+ try{
+  const response=await fetch(MORNING_REPORTS_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+  const d=await response.json();if(!d.ok)throw new Error(d.message||'Report could not be saved.');
+  status.innerHTML='Report submitted successfully. <a href="'+esc(d.fileUrl)+'" target="_blank" rel="noopener noreferrer">Open / download your PDF ↗</a>';
+  e.target.reset();await refreshMorningReports();
+ }catch(err){status.textContent='Submission failed: '+err.message+'. Please try again.';}
+ finally{btn.disabled=false;}
+});
+$('mrRefreshBtn').addEventListener('click',refreshMorningReports);
+refreshMorningReports();
+
 const SANGEET_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrpDbjAwYE06Gkl6qAvqd5pAzAEFHW-WKB-gcuaByGPWDclUI8mDCQWk9pHc-eBdUj/exec";
 const SANGEET_CORRECTION_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYCLQQvkgEMuzhj8dwu7IHIjsZ1DTAGtfv6nSLxaXelvjfddJS6_dhVwTFn0AbwyOPQ/exec";
 function normaliseDDMMYYYY(value){
