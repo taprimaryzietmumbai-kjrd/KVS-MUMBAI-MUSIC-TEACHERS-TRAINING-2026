@@ -148,6 +148,15 @@
 <div class="actions"><button class="btn" id="mrSubmitBtn" type="submit">Submit Morning Presentation Report</button><button class="btn ghost" type="reset">Clear form</button></div>
 <div id="mrSubmitStatus" class="notice" aria-live="polite" style="margin-top:14px">Your report will be saved as a PDF in the shared Drive repository after successful submission.</div>
 </form></div>
+
+<div class="panel" id="morningAdminPanel">
+ <div class="eyebrow">ZIET Mumbai · restricted access</div><h2>Administrator access</h2>
+ <p class="muted">Only the authorised administrator can manage published reports. A one-time code will be sent to the registered administrator mailbox.</p>
+ <div class="actions"><button class="btn secondary" type="button" id="mrRequestOtp">Send administrator OTP</button></div>
+ <div class="formgrid"><div><label for="mrAdminOtp">One-time verification code</label><input id="mrAdminOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter 6-digit code"></div></div>
+ <div class="actions"><button class="btn" type="button" id="mrVerifyOtp">Verify and unlock admin controls</button><button class="btn ghost" type="button" id="mrAdminLogout">Lock admin controls</button></div>
+ <div id="mrAdminStatus" class="muted" aria-live="polite"></div>
+</div>
 <div class="panel"><div class="eyebrow">Shared repository</div><h2>Submitted Morning Presentation Reports</h2><p class="muted">Reports successfully submitted through this form will be listed here with links to open or download their PDF copies.</p>
 <div class="actions"><button class="btn secondary" id="mrRefreshBtn" type="button">↻ Refresh reports</button></div>
 <div id="morningReportList" class="grid" style="margin-top:14px"><div class="empty">Loading submitted reports…</div></div>
@@ -190,9 +199,9 @@ function morningReportJsonp(action){
  });
 }
 function renderMorningReports(items){
- const box=$('morningReportList');
+ const box=$('morningReportList'),isAdmin=!!sessionStorage.getItem('sangeet_morning_admin_token');
  if(!items||!items.length){box.innerHTML='<div class="empty">No morning presentation reports have been submitted yet.</div>';return;}
- box.innerHTML=items.map((r,i)=>'<div class="tile resource"><span class="tag">'+esc(r.date||'Presentation report')+'</span><h3>'+esc(r.title||'Morning Presentation Report')+'</h3><p><b>'+esc(r.name||'')+'</b><br><span class="muted">'+esc(r.school||'')+' · '+esc(r.region||'')+'</span></p><a href="'+esc(r.url||'#')+'" target="_blank" rel="noopener noreferrer">Open / download PDF ↗</a>'+(r.resource?'<p><a href="'+esc(r.resource)+'" target="_blank" rel="noopener noreferrer">Supporting presentation / resource ↗</a></p>':'')+'</div>').join('');
+ box.innerHTML=items.map((r,i)=>'<div class="tile resource"><span class="tag">'+esc(r.date||'Presentation report')+'</span><h3>'+esc(r.title||'Morning Presentation Report')+'</h3><p><b>'+esc(r.name||'')+'</b><br><span class="muted">'+esc(r.school||'')+' · '+esc(r.region||'')+'</span></p><a href="'+esc(r.url||'#')+'" target="_blank" rel="noopener noreferrer">Open / download PDF ↗</a>'+(r.resource?'<p><a href="'+esc(r.resource)+'" target="_blank" rel="noopener noreferrer">Supporting presentation / resource ↗</a></p>':'')+(isAdmin?'<div class="actions"><button class="btn secondary" type="button" onclick="adminEditMorningReport('+Number(r.rowNumber)+')">Edit report</button><button class="btn danger" type="button" onclick="adminDeleteMorningReport('+Number(r.rowNumber)+')">Delete report</button></div>':'')+'</div>').join('');
 }
 async function refreshMorningReports(){
  const box=$('morningReportList');box.innerHTML='<div class="empty">Loading submitted reports…</div>';
@@ -201,10 +210,13 @@ async function refreshMorningReports(){
 }
 $('morningReportForm').addEventListener('submit',async e=>{
  e.preventDefault();const btn=$('mrSubmitBtn'),status=$('mrSubmitStatus');
- const payload={action:'saveMorningReport',requestId:'MR-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),
+ const isAdminEdit=!!window.morningAdminEditRow,adminToken=sessionStorage.getItem('sangeet_morning_admin_token');
+ if(isAdminEdit&&!adminToken){status.textContent='Administrator session expired. Verify again before editing.';return;}
+ const payload={action:isAdminEdit?'adminEditMorningReport':'saveMorningReport',requestId:'MR-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),
  name:$('mrName').value.trim(),region:$('mrRegion').value.trim(),school:$('mrSchool').value.trim(),
  date:$('mrDate').value,title:$('mrTitle').value.trim(),summary:$('mrSummary').value.trim(),
  learning:$('mrLearning').value.trim(),application:$('mrApplication').value.trim(),resource:$('mrResource').value.trim()};
+ if(isAdminEdit){payload.rowNumber=window.morningAdminEditRow;payload.adminToken=adminToken;}
  btn.disabled=true;status.textContent='Submitting report and creating your PDF…';
  try{
   let frame=$('morningReportPostFrame');
@@ -216,11 +228,55 @@ $('morningReportForm').addEventListener('submit',async e=>{
    const poll=()=>{const sc=document.createElement('script');window[cb]=data=>{sc.remove();delete window[cb];if(data&&!data.pending){resolve(data);return;}if(++attempts>=25){reject(new Error('Submission status timed out. Please refresh the report list before resubmitting.'));return;}setTimeout(poll,1000);};sc.onerror=()=>{sc.remove();delete window[cb];reject(new Error('Could not check submission status.'));};sc.src=MORNING_REPORTS_API+'?action=status&id='+encodeURIComponent(payload.requestId)+'&callback='+encodeURIComponent(cb);document.body.appendChild(sc);};poll();
   });
   if(!d.ok)throw new Error(d.message||'Report could not be saved.');
-  status.innerHTML='Report submitted successfully. <a href="'+esc(d.fileUrl)+'" target="_blank" rel="noopener noreferrer">Open / download your PDF ↗</a>';
-  e.target.reset();await refreshMorningReports();
+  status.innerHTML=(isAdminEdit?'Report updated successfully. ':'Report submitted successfully. ')+'<a href="'+esc(d.fileUrl)+'" target="_blank" rel="noopener noreferrer">Open / download PDF ↗</a>';
+  e.target.reset();if(isAdminEdit){window.morningAdminEditRow=null;$('mrSubmitBtn').textContent='Submit Morning Presentation Report';}await refreshMorningReports();
  }catch(err){status.textContent='Submission failed: '+err.message+'. Please refresh the report list before trying again.';}
  finally{btn.disabled=false;}
 });
+
+function postMorningAdmin(payload){
+ return new Promise((resolve,reject)=>{
+  const frameId='morningAdminActionFrame';
+  let frame=$(frameId);if(!frame){frame=document.createElement('iframe');frame.id=frameId;frame.name=frameId;frame.style.display='none';document.body.appendChild(frame);}
+  const handler=e=>{if(!e.data||e.data.type!=='SANGEET_REPORT_RESULT')return;window.removeEventListener('message',handler);resolve(e.data.data||{});};
+  window.addEventListener('message',handler);
+  const form=document.createElement('form');form.method='POST';form.action=MORNING_REPORTS_API;form.target=frameId;form.style.display='none';
+  const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
+  setTimeout(()=>{window.removeEventListener('message',handler);reject(new Error('The Apps Script did not return a response. Check deployment and try again.'));},20000);
+ });
+}
+$('mrRequestOtp').addEventListener('click',async()=>{
+ $('mrAdminStatus').textContent='Requesting a verification code…';
+ try{const d=await postMorningAdmin({action:'adminRequestOtp'});$('mrAdminStatus').textContent=d.message|| (d.ok?'OTP sent.':'Unable to send OTP.');}
+ catch(e){$('mrAdminStatus').textContent=e.message;}
+});
+$('mrVerifyOtp').addEventListener('click',async()=>{
+ const otp=$('mrAdminOtp').value.trim();if(!/^\d{6}$/.test(otp)){$('mrAdminStatus').textContent='Enter the six-digit code sent to the administrator mailbox.';return;}
+ $('mrAdminStatus').textContent='Verifying administrator code…';
+ try{const d=await postMorningAdmin({action:'adminVerifyOtp',otp});
+  if(!d.ok)throw new Error(d.message||'Verification failed.');
+  sessionStorage.setItem('sangeet_morning_admin_token',d.adminToken);
+  $('mrAdminStatus').textContent='Administrator access enabled for '+d.adminEmail+'. Session expires after 30 minutes of inactivity.';
+  refreshMorningReports();
+ }catch(e){$('mrAdminStatus').textContent=e.message;}
+});
+$('mrAdminLogout').addEventListener('click',()=>{sessionStorage.removeItem('sangeet_morning_admin_token');$('mrAdminStatus').textContent='Administrator controls locked.';refreshMorningReports();});
+window.adminEditMorningReport=async rowNumber=>{
+ const token=sessionStorage.getItem('sangeet_morning_admin_token');if(!token){alert('Verify administrator access first.');return;}
+ const d=await morningReportJsonp('listMorningReports');const r=(d.reports||[]).find(x=>Number(x.rowNumber)===Number(rowNumber));if(!r){alert('Report record not found. Refresh the list.');return;}
+ $('mrName').value=r.name||'';$('mrRegion').value=r.region||'';$('mrSchool').value=r.school||'';$('mrDate').value=r.date||'';$('mrTitle').value=r.title||'';$('mrSummary').value=r.summary||'';$('mrLearning').value=r.learning||'';$('mrApplication').value=r.application||'';$('mrResource').value=r.resource||'';
+ window.morningAdminEditRow=Number(rowNumber);
+ $('mrSubmitBtn').textContent='Save revised report (Admin)';
+ $('mrSubmitStatus').textContent='Administrator edit mode: revise the fields and submit to replace the published PDF.';
+ $('morningReportForm').scrollIntoView({behavior:'smooth',block:'start'});
+};
+window.adminDeleteMorningReport=async rowNumber=>{
+ const token=sessionStorage.getItem('sangeet_morning_admin_token');if(!token){alert('Verify administrator access first.');return;}
+ if(!confirm('Delete this report from the public library and move its PDF to Drive trash?'))return;
+ try{const d=await postMorningAdmin({action:'adminDeleteMorningReport',requestId:'MRDEL-'+Date.now(),rowNumber:rowNumber,adminToken:token});if(!d.ok)throw new Error(d.message||'Delete failed.');$('mrAdminStatus').textContent=d.message;refreshMorningReports();}
+ catch(e){alert(e.message);}
+};
+
 $('mrRefreshBtn').addEventListener('click',refreshMorningReports);
 refreshMorningReports();
 
