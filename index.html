@@ -13,6 +13,20 @@
 .sf-heading{text-align:center;line-height:1.45;margin:8px 0 16px;color:#172554}.sf-heading h2{margin:7px 0 0;font-size:19px;letter-spacing:.8px}.sf-identity{display:grid;grid-template-columns:1fr 1.4fr .7fr;gap:14px;margin:16px 0}.sf-identity label{font-size:13px}.sf-identity input{height:34px;border:0;border-bottom:1px solid #333;border-radius:0;padding:3px 5px}.sf-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.sf-table th,.sf-table td{border:1px solid #333;padding:7px;vertical-align:top}.sf-table thead th{text-align:center;background:#f1f4f8}.sf-table thead th:nth-child(1){width:19%}.sf-table thead th:nth-child(2){width:20%}.sf-table thead th:nth-child(3){width:23%}.sf-table thead th:nth-child(4){width:20%}.sf-table thead th:nth-child(5){width:18%}.sf-session-row td{height:100px}.sf-session-row textarea{height:88px;min-height:88px;border:0;padding:3px;resize:none}.sf-session-row input{border:0;padding:3px}.sf-note{font-size:11px;color:#555;margin-top:10px}.sf-facility th:first-child{width:20%}.sf-facility th:not(:first-child){width:20%}.sf-facility tbody th{background:#f8fafc;text-align:left}.sf-facility textarea{height:105px;min-height:105px;border:0;padding:3px;resize:none}.sf-facility input{border:0;text-align:center}.sf-sign{display:flex;justify-content:space-between;margin-top:28px;font-size:12px}
 @media screen{.sf-page{border:1px solid #cbd5e1;border-radius:8px;padding:20px;margin:16px 0;background:#fff}}
 @media print{@page{size:A4 landscape;margin:10mm}body{background:#fff!important}#printableSessionFeedback .actions,#printableSessionFeedback>.muted,#printableSessionFeedback>.eyebrow,#printableSessionFeedback>h2{display:none!important}#printableSessionFeedback{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}.sf-page{border:0!important;border-radius:0!important;padding:0!important;margin:0!important;break-after:page;page-break-after:always}.sf-page:last-child{break-after:auto;page-break-after:auto}.sf-heading{margin:0 0 12px}.sf-table{font-size:10pt}.sf-session-row td{height:105px}.sf-session-row textarea{height:95px;min-height:95px}.sf-facility textarea{height:112px;min-height:112px}}
+
+.social-banner{margin:16px 0 20px;border-radius:16px;overflow:hidden;border:1px solid #dbe4f0;background:linear-gradient(135deg,#f8fbff,#eef4ff)}
+.social-banner-head{padding:17px 20px;background:linear-gradient(110deg,#172554,#1e40af);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.social-banner-head h3{margin:0;font-size:19px;letter-spacing:.2px}.social-banner-head p{margin:3px 0 0;color:#dbeafe;font-size:12px}
+.social-total{background:#ffffff20;border:1px solid #ffffff55;border-radius:12px;padding:7px 13px;text-align:center}.social-total strong{display:block;font-size:23px;line-height:1.1}.social-total span{font-size:10px;letter-spacing:.7px;text-transform:uppercase}
+.social-groups{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px}
+.social-group{background:#fff;border:1px solid #dbe4f0;border-radius:12px;padding:13px}
+.social-group-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;color:#172554;font-weight:800}.social-group-title strong{font-size:21px}
+.social-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.social-cat{background:#f5f7fb;border:1px solid #e5eaf2;border-radius:9px;padding:9px 5px;text-align:center}
+.social-cat b{display:block;font-size:20px;color:#1e3a8a}.social-cat span{font-size:11px;color:#64748b;font-weight:700}
+.social-banner-foot{padding:0 18px 13px;color:#64748b;font-size:11px}
+@media(max-width:600px){.social-groups{grid-template-columns:1fr;padding:11px}.social-cats{gap:5px}.social-cat{padding:8px 3px}.social-cat b{font-size:18px}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><style>@media print{body.sang-attendance-print .hero,body.sang-attendance-print .stats,body.sang-attendance-print .side,body.sang-attendance-print .foot,body.sang-attendance-print .actions,body.sang-attendance-print .eyebrow,body.sang-attendance-print .muted{display:none!important}body.sang-attendance-print .layout{display:block!important;margin:0!important}body.sang-attendance-print .section{display:none!important}body.sang-attendance-print #attendance{display:block!important}body.sang-attendance-print .panel{box-shadow:none;border:0;padding:0;margin:0}body.sang-attendance-print #sangAttendanceHeading{display:block!important}body.sang-attendance-print #sangAttendanceTable{font-size:8pt;border-collapse:collapse;width:100%}body.sang-attendance-print #sangAttendanceTable th,body.sang-attendance-print #sangAttendanceTable td{border:1px solid #222;padding:5px}body.sang-attendance-print #sangAttendanceTable tr{break-inside:avoid}}@page{size:A4 landscape;margin:10mm}</style>
 </head>
@@ -49,6 +63,35 @@
 <div class="content">
 <section id="overview" class="section active">
 <div class="panel"><div class="eyebrow">Welcome</div><h2>Celebrating music, strengthening practice</h2><p>This five-day face-to-face professional learning programme brings together Music Teachers of Kendriya Vidyalayas under KVS Mumbai Region at ZIET Mumbai. The hub will serve as a common point for programme information, learning resources, participant contributions and workshop documentation.</p><div class="notice"><b>Programme information:</b> The dates, venue and mode are confirmed as provided. Session timings, resource-person names, participant roster and links will be added after they are finalised.</div></div>
+
+<div class="social-banner" aria-label="Social Category Bifurcation dashboard">
+ <div class="social-banner-head">
+  <div><h3>Social Category Bifurcation</h3><p>Gender-wise participant distribution · PRT (Music), KVS Mumbai Region</p></div>
+  <div class="social-total"><strong>48</strong><span>Total Participants</span></div>
+ </div>
+ <div class="social-groups">
+  <div class="social-group">
+   <div class="social-group-title"><span>Male</span><strong>33</strong></div>
+   <div class="social-cats">
+    <div class="social-cat"><b>7</b><span>General</span></div>
+    <div class="social-cat"><b>10</b><span>SC</span></div>
+    <div class="social-cat"><b>1</b><span>ST</span></div>
+    <div class="social-cat"><b>15</b><span>OBC</span></div>
+   </div>
+  </div>
+  <div class="social-group">
+   <div class="social-group-title"><span>Female</span><strong>15</strong></div>
+   <div class="social-cats">
+    <div class="social-cat"><b>6</b><span>General</span></div>
+    <div class="social-cat"><b>4</b><span>SC</span></div>
+    <div class="social-cat"><b>2</b><span>ST</span></div>
+    <div class="social-cat"><b>3</b><span>OBC</span></div>
+   </div>
+  </div>
+ </div>
+ <div class="social-banner-foot">Source: participant master sheet, Column Y (Gender) and Column Z (Category). “GENERALERAL” has been grouped under General for reporting; source data remains unchanged.</div>
+</div>
+
 <div class="grid"><div class="tile"><h3>Purpose</h3><p class="muted">Strengthen music teaching through practical engagement, shared repertoire, performance, reflection and classroom-ready strategies.</p></div><div class="tile"><h3>Learning approach</h3><p class="muted">Listen · Explore · Practise · Create · Perform · Reflect</p></div><div class="tile"><h3>Venue</h3><p class="muted">Zonal Institute of Education & Training, Mumbai<br>आंचलिक शिक्षा एवं प्रशिक्षण संस्थान, मुंबई</p></div><div class="tile"><h3>Mode</h3><p class="muted">Face-to-face participation for Music Teachers of KVS Mumbai Region.</p></div></div>
 </section>
 <section id="programme" class="section"><div class="panel"><div class="eyebrow">23–27 November 2026</div><h2>Programme schedule</h2><p class="muted">The day-wise session timetable can be populated when session titles, timings and resource persons are confirmed.</p>
