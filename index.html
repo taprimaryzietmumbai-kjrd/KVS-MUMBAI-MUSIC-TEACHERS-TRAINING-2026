@@ -207,11 +207,18 @@ $('morningReportForm').addEventListener('submit',async e=>{
  learning:$('mrLearning').value.trim(),application:$('mrApplication').value.trim(),resource:$('mrResource').value.trim()};
  btn.disabled=true;status.textContent='Submitting report and creating your PDF…';
  try{
-  const response=await fetch(MORNING_REPORTS_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-  const d=await response.json();if(!d.ok)throw new Error(d.message||'Report could not be saved.');
+  let frame=$('morningReportPostFrame');
+  if(!frame){frame=document.createElement('iframe');frame.name='morningReportPostFrame';frame.id='morningReportPostFrame';frame.style.display='none';document.body.appendChild(frame);}
+  const form=document.createElement('form');form.method='POST';form.action=MORNING_REPORTS_API;form.target='morningReportPostFrame';form.style.display='none';
+  const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();
+  const d=await new Promise((resolve,reject)=>{
+   let attempts=0;const cb='morningReportStatus'+Date.now();
+   const poll=()=>{const sc=document.createElement('script');window[cb]=data=>{sc.remove();delete window[cb];if(data&&!data.pending){resolve(data);return;}if(++attempts>=25){reject(new Error('Submission status timed out. Please refresh the report list before resubmitting.'));return;}setTimeout(poll,1000);};sc.onerror=()=>{sc.remove();delete window[cb];reject(new Error('Could not check submission status.'));};sc.src=MORNING_REPORTS_API+'?action=status&id='+encodeURIComponent(payload.requestId)+'&callback='+encodeURIComponent(cb);document.body.appendChild(sc);};poll();
+  });
+  if(!d.ok)throw new Error(d.message||'Report could not be saved.');
   status.innerHTML='Report submitted successfully. <a href="'+esc(d.fileUrl)+'" target="_blank" rel="noopener noreferrer">Open / download your PDF ↗</a>';
   e.target.reset();await refreshMorningReports();
- }catch(err){status.textContent='Submission failed: '+err.message+'. Please try again.';}
+ }catch(err){status.textContent='Submission failed: '+err.message+'. Please refresh the report list before trying again.';}
  finally{btn.disabled=false;}
 });
 $('mrRefreshBtn').addEventListener('click',refreshMorningReports);
